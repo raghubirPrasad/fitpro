@@ -4,6 +4,7 @@ import wellnessapp.models.User;
 import wellnessapp.models.MealData;
 import wellnessapp.utils.FileHandler;
 import wellnessapp.utils.Validator;
+import wellnessapp.utils.AnimatedButton;
 import wellnessapp.exceptions.InvalidInputException;
 
 import javax.swing.*;
@@ -28,6 +29,7 @@ public class MealPanel extends JPanel {
     private JTextArea mealsListArea;
     private JLabel currentWaterLabel;
     private JLabel currentCaloriesLabel;
+    private float alpha = 0.0f; // For fade-in effect
     
     public MealPanel(User user) {
         this.user = user;
@@ -35,9 +37,32 @@ public class MealPanel extends JPanel {
         loadData();
         
         setLayout(new BorderLayout());
+        setOpaque(true);
         
-        // Title
-        JLabel titleLabel = new JLabel("Meal Tracking", JLabel.CENTER);
+        // Start fade-in animation
+        startFadeInAnimation();
+        
+        // Title with subtle shadow
+        JLabel titleLabel = new JLabel("Meal Tracking") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                
+                g2d.setColor(new Color(0, 0, 0, 30));
+                FontMetrics fm = g2d.getFontMetrics();
+                int textX = (getWidth() - fm.stringWidth(getText())) / 2;
+                int textY = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
+                g2d.drawString(getText(), textX + 2, textY + 2);
+                
+                g2d.setColor(getForeground());
+                g2d.drawString(getText(), textX, textY);
+                
+                g2d.dispose();
+            }
+        };
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         add(titleLabel, BorderLayout.NORTH);
         
@@ -91,30 +116,35 @@ public class MealPanel extends JPanel {
         
         // Targets
         gbc.gridy = 7;
+        gbc.gridwidth = 2;
         inputPanel.add(new JSeparator(), gbc);
         
         gbc.gridy = 8;
         gbc.gridwidth = 1;
+        gbc.gridx = 0;
         inputPanel.add(new JLabel("Target Water (ml):"), gbc);
         gbc.gridx = 1;
         targetWaterField = new JTextField(15);
         targetWaterField.setText(String.valueOf(mealData.getTargetWater()));
         inputPanel.add(targetWaterField, gbc);
         
-        gbc.gridx = 0;
         gbc.gridy = 9;
+        gbc.gridwidth = 1;
+        gbc.gridx = 0;
         inputPanel.add(new JLabel("Target Calories:"), gbc);
         gbc.gridx = 1;
         targetCaloriesField = new JTextField(15);
         targetCaloriesField.setText(String.valueOf(mealData.getTargetCalories()));
         inputPanel.add(targetCaloriesField, gbc);
         
-        // Buttons
+        // Buttons with animations
         JPanel buttonPanel = new JPanel(new FlowLayout());
-        JButton addMealButton = new JButton("Add Meal");
-        JButton addWaterButton = new JButton("Add Water");
-        JButton updateTargetsButton = new JButton("Update Targets");
-        JButton newDayButton = new JButton("New Day");
+        AnimatedButton addMealButton = new AnimatedButton("Add Meal");
+        AnimatedButton addWaterButton = new AnimatedButton("Add Water");
+        addWaterButton.setButtonColors(new Color(33, 150, 243), new Color(25, 118, 210), new Color(21, 101, 192));
+        AnimatedButton updateTargetsButton = new AnimatedButton("Update Targets");
+        AnimatedButton newDayButton = new AnimatedButton("New Day");
+        newDayButton.setButtonColors(new Color(255, 152, 0), new Color(255, 193, 7), new Color(255, 143, 0));
         buttonPanel.add(addMealButton);
         buttonPanel.add(addWaterButton);
         buttonPanel.add(updateTargetsButton);
@@ -170,6 +200,30 @@ public class MealPanel extends JPanel {
         });
     }
     
+    private void startFadeInAnimation() {
+        alpha = 0.0f;
+        Timer fadeTimer = new Timer(20, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                alpha += 0.05f;
+                if (alpha >= 1.0f) {
+                    alpha = 1.0f;
+                    ((Timer) e.getSource()).stop();
+                }
+                repaint();
+            }
+        });
+        fadeTimer.start();
+    }
+    
+    @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g.create();
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+        super.paintComponent(g2d);
+        g2d.dispose();
+    }
+    
     private void handleAddMeal() {
         try {
             String mealName = mealNameField.getText().trim();
@@ -194,6 +248,9 @@ public class MealPanel extends JPanel {
             updateDisplay();
             mealNameField.setText("");
             mealCaloriesField.setText("");
+            
+            // Visual feedback
+            animateMealAdded();
             
             JOptionPane.showMessageDialog(this, "Meal added successfully!", 
                 "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -264,10 +321,77 @@ public class MealPanel extends JPanel {
         }
     }
     
+    private void animateMealAdded() {
+        // Flash effect and scroll to bottom
+        Timer flashTimer = new Timer(50, new ActionListener() {
+            private int count = 0;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (count < 3) {
+                    Color originalColor = currentCaloriesLabel.getForeground();
+                    currentCaloriesLabel.setForeground(count % 2 == 0 ? new Color(76, 175, 80) : originalColor);
+                    count++;
+                } else {
+                    currentCaloriesLabel.setForeground(Color.BLACK);
+                    ((Timer) e.getSource()).stop();
+                }
+            }
+        });
+        flashTimer.start();
+        
+        // Scroll to bottom of meals list
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                mealsListArea.setCaretPosition(mealsListArea.getDocument().getLength());
+            }
+        });
+    }
+    
     private void updateDisplay() {
-        currentWaterLabel.setText("Water: " + mealData.getWaterIntake() + " ml");
-        currentCaloriesLabel.setText("Calories: " + mealData.getCaloriesEaten());
+        animateNumberChange(currentWaterLabel, "Water: ", mealData.getWaterIntake(), " ml");
+        animateNumberChange(currentCaloriesLabel, "Calories: ", mealData.getCaloriesEaten(), "");
         updateMealsList();
+    }
+    
+    private void animateNumberChange(JLabel label, String prefix, int targetValue, String suffix) {
+        String currentText = label.getText();
+        int initialValue = 0;
+        try {
+            String valueStr = currentText.replace(prefix, "").replace(suffix, "").trim();
+            if (valueStr.contains(" ")) {
+                valueStr = valueStr.split(" ")[0];
+            }
+            initialValue = Integer.parseInt(valueStr);
+        } catch (Exception e) {
+            initialValue = 0;
+        }
+        
+        final int startValue = initialValue;
+        
+        if (startValue == targetValue) {
+            label.setText(prefix + targetValue + suffix);
+            return;
+        }
+        
+        Timer animTimer = new Timer(10, new ActionListener() {
+            private int animatedValue = startValue;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int diff = targetValue - animatedValue;
+                if (Math.abs(diff) > 0) {
+                    animatedValue += diff > 0 ? Math.max(1, diff / 10) : Math.min(-1, diff / 10);
+                    if (Math.abs(targetValue - animatedValue) < 1) {
+                        animatedValue = targetValue;
+                    }
+                    label.setText(prefix + animatedValue + suffix);
+                } else {
+                    label.setText(prefix + targetValue + suffix);
+                    ((Timer) e.getSource()).stop();
+                }
+            }
+        });
+        animTimer.start();
     }
     
     private void updateMealsList() {

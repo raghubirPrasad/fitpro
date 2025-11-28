@@ -21,10 +21,18 @@ public class Calculator {
         return isMale ? bmr + 5 : bmr - 161;
     }
     
-    // Static method for TDEE (Total Daily Energy Expenditure)
+    // Static method for TDEE (Total Daily Energy Expenditure) - using BMR
     public static double calculateTDEE(double bmr, double activityLevel) {
         // activityLevel: 1.2 (sedentary), 1.375 (light), 1.55 (moderate), 1.725 (active), 1.9 (very active)
         return bmr * activityLevel;
+    }
+    
+    // Overloaded method for TDEE calculation - takes weight, height, age, gender, and activity level
+    // Demonstrates: Method overloading
+    public static double calculateTDEE(double weight, double height, int age, boolean isMale, double activityLevel) {
+        // First calculate BMR, then multiply by activity level
+        double bmr = calculateBMR(weight, height, age, isMale);
+        return calculateTDEE(bmr, activityLevel);
     }
 }
 

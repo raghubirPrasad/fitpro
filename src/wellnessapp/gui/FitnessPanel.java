@@ -4,6 +4,7 @@ import wellnessapp.models.User;
 import wellnessapp.models.FitnessData;
 import wellnessapp.utils.FileHandler;
 import wellnessapp.utils.Validator;
+import wellnessapp.utils.AnimatedButton;
 import wellnessapp.exceptions.InvalidInputException;
 
 import javax.swing.*;
@@ -28,6 +29,7 @@ public class FitnessPanel extends JPanel {
     private JTextField targetCaloriesField;
     private JLabel currentStepsLabel;
     private JLabel currentCaloriesLabel;
+    private float alpha = 0.0f; // For fade-in effect
     
     public FitnessPanel(User user) {
         this.user = user;
@@ -35,9 +37,32 @@ public class FitnessPanel extends JPanel {
         loadData();
         
         setLayout(new BorderLayout());
+        setOpaque(true);
         
-        // Title
-        JLabel titleLabel = new JLabel("Fitness Tracking", JLabel.CENTER);
+        // Start fade-in animation
+        startFadeInAnimation();
+        
+        // Title with subtle shadow
+        JLabel titleLabel = new JLabel("Fitness Tracking") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                
+                g2d.setColor(new Color(0, 0, 0, 30));
+                FontMetrics fm = g2d.getFontMetrics();
+                int textX = (getWidth() - fm.stringWidth(getText())) / 2;
+                int textY = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
+                g2d.drawString(getText(), textX + 2, textY + 2);
+                
+                g2d.setColor(getForeground());
+                g2d.drawString(getText(), textX, textY);
+                
+                g2d.dispose();
+            }
+        };
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         add(titleLabel, BorderLayout.NORTH);
         
@@ -96,10 +121,12 @@ public class FitnessPanel extends JPanel {
         
         // Targets
         gbc.gridy = 8;
+        gbc.gridwidth = 2;
         mainPanel.add(new JSeparator(), gbc);
         
         gbc.gridy = 9;
         gbc.gridwidth = 1;
+        gbc.gridx = 0;
         mainPanel.add(new JLabel("Target Steps:"), gbc);
         gbc.gridx = 1;
         targetStepsField = new JTextField(10);
@@ -114,11 +141,12 @@ public class FitnessPanel extends JPanel {
         targetCaloriesField.setText(String.valueOf(fitnessData.getTargetCalories()));
         mainPanel.add(targetCaloriesField, gbc);
         
-        // Buttons
+        // Buttons with animations
         JPanel buttonPanel = new JPanel(new FlowLayout());
-        JButton addButton = new JButton("Add Data");
-        JButton updateTargetsButton = new JButton("Update Targets");
-        JButton newDayButton = new JButton("New Day");
+        AnimatedButton addButton = new AnimatedButton("Add Data");
+        AnimatedButton updateTargetsButton = new AnimatedButton("Update Targets");
+        AnimatedButton newDayButton = new AnimatedButton("New Day");
+        newDayButton.setButtonColors(new Color(255, 152, 0), new Color(255, 193, 7), new Color(255, 143, 0));
         buttonPanel.add(addButton);
         buttonPanel.add(updateTargetsButton);
         buttonPanel.add(newDayButton);
@@ -153,6 +181,30 @@ public class FitnessPanel extends JPanel {
         });
     }
     
+    private void startFadeInAnimation() {
+        alpha = 0.0f;
+        Timer fadeTimer = new Timer(20, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                alpha += 0.05f;
+                if (alpha >= 1.0f) {
+                    alpha = 1.0f;
+                    ((Timer) e.getSource()).stop();
+                }
+                repaint();
+            }
+        });
+        fadeTimer.start();
+    }
+    
+    @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g.create();
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+        super.paintComponent(g2d);
+        g2d.dispose();
+    }
+    
     private void handleAddData() {
         try {
             String stepsStr = stepsField.getText().trim();
@@ -183,6 +235,9 @@ public class FitnessPanel extends JPanel {
             caloriesField.setText("");
             workoutTypeField.setText("");
             sportTypeField.setText("");
+            
+            // Visual feedback with animation
+            animateSuccessFeedback();
             
             JOptionPane.showMessageDialog(this, "Data added successfully!", 
                 "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -229,9 +284,68 @@ public class FitnessPanel extends JPanel {
         }
     }
     
+    private void animateSuccessFeedback() {
+        // Flash effect on current stats labels
+        Timer flashTimer = new Timer(50, new ActionListener() {
+            private int count = 0;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (count < 3) {
+                    Color originalColor = currentStepsLabel.getForeground();
+                    currentStepsLabel.setForeground(count % 2 == 0 ? new Color(76, 175, 80) : originalColor);
+                    currentCaloriesLabel.setForeground(count % 2 == 0 ? new Color(76, 175, 80) : originalColor);
+                    count++;
+                } else {
+                    currentStepsLabel.setForeground(Color.BLACK);
+                    currentCaloriesLabel.setForeground(Color.BLACK);
+                    ((Timer) e.getSource()).stop();
+                }
+            }
+        });
+        flashTimer.start();
+    }
+    
     private void updateDisplay() {
-        currentStepsLabel.setText("Steps: " + fitnessData.getSteps());
-        currentCaloriesLabel.setText("Calories Burned: " + fitnessData.getCaloriesBurned());
+        // Animate number changes
+        animateNumberChange(currentStepsLabel, "Steps: ", fitnessData.getSteps());
+        animateNumberChange(currentCaloriesLabel, "Calories Burned: ", fitnessData.getCaloriesBurned());
+    }
+    
+    private void animateNumberChange(JLabel label, String prefix, int targetValue) {
+        String currentText = label.getText();
+        int initialValue = 0;
+        try {
+            String valueStr = currentText.substring(prefix.length()).trim();
+            initialValue = Integer.parseInt(valueStr);
+        } catch (Exception e) {
+            initialValue = 0;
+        }
+        
+        final int startValue = initialValue;
+        
+        if (startValue == targetValue) {
+            label.setText(prefix + targetValue);
+            return;
+        }
+        
+        Timer animTimer = new Timer(10, new ActionListener() {
+            private int animatedValue = startValue;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int diff = targetValue - animatedValue;
+                if (Math.abs(diff) > 0) {
+                    animatedValue += diff > 0 ? Math.max(1, diff / 10) : Math.min(-1, diff / 10);
+                    if (Math.abs(targetValue - animatedValue) < 1) {
+                        animatedValue = targetValue;
+                    }
+                    label.setText(prefix + animatedValue);
+                } else {
+                    label.setText(prefix + targetValue);
+                    ((Timer) e.getSource()).stop();
+                }
+            }
+        });
+        animTimer.start();
     }
     
     private void loadData() {

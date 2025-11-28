@@ -32,14 +32,39 @@ public class MainFrame extends JFrame {
         habitPanel = new HabitPanel(user);
         calculatorPanel = new CalculatorPanel(user);
         
-        // Navigation panel
-        JPanel navPanel = new JPanel(new FlowLayout());
-        JButton dashboardButton = new JButton("Dashboard");
-        JButton fitnessButton = new JButton("Fitness");
-        JButton mealButton = new JButton("Meals");
-        JButton habitButton = new JButton("Habits");
-        JButton calculatorButton = new JButton("Calculators");
-        JButton logoutButton = new JButton("Logout");
+        // Navigation panel with animated buttons and subtle gradient
+        JPanel navPanel = new JPanel(new FlowLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Subtle gradient background
+                GradientPaint gradient = new GradientPaint(
+                    0, 0, new Color(248, 248, 248),
+                    0, getHeight(), new Color(240, 240, 240)
+                );
+                g2d.setPaint(gradient);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+                
+                // Subtle bottom border
+                g2d.setColor(new Color(200, 200, 200));
+                g2d.setStroke(new BasicStroke(1.0f));
+                g2d.drawLine(0, getHeight() - 1, getWidth(), getHeight() - 1);
+                
+                g2d.dispose();
+            }
+        };
+        navPanel.setOpaque(false);
+        navPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        wellnessapp.utils.AnimatedButton dashboardButton = new wellnessapp.utils.AnimatedButton("Dashboard");
+        wellnessapp.utils.AnimatedButton fitnessButton = new wellnessapp.utils.AnimatedButton("Fitness");
+        wellnessapp.utils.AnimatedButton mealButton = new wellnessapp.utils.AnimatedButton("Meals");
+        wellnessapp.utils.AnimatedButton habitButton = new wellnessapp.utils.AnimatedButton("Habits");
+        wellnessapp.utils.AnimatedButton calculatorButton = new wellnessapp.utils.AnimatedButton("Calculators");
+        wellnessapp.utils.AnimatedButton logoutButton = new wellnessapp.utils.AnimatedButton("Logout");
+        logoutButton.setButtonColors(new Color(244, 67, 54), new Color(211, 47, 47), new Color(198, 40, 40));
         
         navPanel.add(dashboardButton);
         navPanel.add(fitnessButton);
