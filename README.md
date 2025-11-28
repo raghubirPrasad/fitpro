@@ -2,7 +2,7 @@
 
 A comprehensive wellness tracking application built with Java Swing, demonstrating Object-Oriented Programming concepts.
 
-## Feature s
+## Features
 
 1. **User Management**
    - Login and create new user accounts
