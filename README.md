@@ -2,13 +2,13 @@
 
 A comprehensive wellness tracking application built with Java Swing, demonstrating Object-Oriented Programming concepts.
 
-## Features
+## Feature s
 
 1. **User Management**
    - Login and create new user accounts
    - Store user information (username, password, height, weight)
 
-2. **Fitness Tracking**
+2. **Fitness Tracking*
    - Track daily steps
    - Record workout types and calories burned
    - Track sports activities

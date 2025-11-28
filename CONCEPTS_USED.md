@@ -1,6 +1,6 @@
 # OOP Concepts Used in Wellness App
 
-This document outlines which Object-Oriented Programming concepts from your course are demonstrated in this project.
+This docu ment outlines which Object-Oriented Programming concepts from your course are demonstrated in this project.
 
 ## 1. Introduction to Object-Oriented Principles and Java Programming ✓
 
