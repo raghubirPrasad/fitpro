@@ -17,21 +17,15 @@ import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * FitnessPanel for tracking fitness activities
- * Demonstrates: GUI components, event handling, exception handling, abstract class inheritance
- */
 public class FitnessPanel extends BasePanel {
     private FitnessData fitnessData;
     
-    // Steps and targets section
     private JTextField stepsField;
     private JTextField targetStepsField;
     private JTextField targetCaloriesField;
     private JLabel currentStepsLabel;
     private JLabel currentCaloriesLabel;
     
-    // Workout/Sport section
     private JComboBox<String> categoryComboBox;
     private JComboBox<String> activityComboBox;
     private JTextField repsField;
@@ -44,7 +38,6 @@ public class FitnessPanel extends BasePanel {
     private JList<String> activitiesList;
     private DefaultListModel<String> activitiesListModel;
     
-    // Labels for dynamic fields
     private JLabel repsLabel;
     private JLabel timeLabel;
     private JLabel distanceLabel;
@@ -52,7 +45,6 @@ public class FitnessPanel extends BasePanel {
     private JLabel manualCaloriesLabel;
     private JLabel manualActivityLabel;
     
-    // MET values for workouts
     private static final Map<String, Double> WORKOUT_MET = new HashMap<>();
     static {
         WORKOUT_MET.put("Push-ups", 8.0);
@@ -78,7 +70,6 @@ public class FitnessPanel extends BasePanel {
         WORKOUT_MET.put("Kettlebell Snatch", 10.0);
     }
     
-    // MET values for sports
     private static final Map<String, Double> SPORT_MET = new HashMap<>();
     static {
         SPORT_MET.put("Running Slow (6 km/h)", 6.0);
@@ -106,13 +97,12 @@ public class FitnessPanel extends BasePanel {
         SPORT_MET.put("Elliptical", 5.0);
     }
     
-    private double caloriesBurned = 0.0; // Global variable for calories burned
+    private double caloriesBurned = 0.0;
     
     public FitnessPanel(User user) {
-        super(user); // Initialize BasePanel (sets user, fileHandler, layout, fade-in)
+        super(user);
         loadData();
         
-        // Title with subtle shadow
         JLabel titleLabel = new JLabel("Fitness Tracking") {
             @Override
             protected void paintComponent(Graphics g) {
@@ -136,16 +126,16 @@ public class FitnessPanel extends BasePanel {
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         add(titleLabel, BorderLayout.NORTH);
         
-        // Main panel with two columns
+        
         JPanel mainPanel = new JPanel(new GridLayout(1, 2, 10, 10));
         
-        // Left panel - Input
+        
         JPanel inputPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.WEST;
         
-        // Current stats
+        
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
@@ -159,11 +149,11 @@ public class FitnessPanel extends BasePanel {
         currentCaloriesLabel = new JLabel("Calories Burned: " + fitnessData.getCaloriesBurned() + " kcal");
         inputPanel.add(currentCaloriesLabel, gbc);
         
-        // Separator
+        
         gbc.gridy = 3;
         inputPanel.add(new JSeparator(), gbc);
         
-        // Steps section
+        
         gbc.gridwidth = 1;
         gbc.gridy = 4;
         gbc.gridx = 0;
@@ -172,24 +162,24 @@ public class FitnessPanel extends BasePanel {
         stepsField = new JTextField(10);
         inputPanel.add(stepsField, gbc);
         
-        // Add Steps button
+        
         gbc.gridy = 5;
         gbc.gridwidth = 2;
         gbc.gridx = 0;
         AnimatedButton addStepsButton = new AnimatedButton("Add Steps");
         inputPanel.add(addStepsButton, gbc);
         
-        // Separator before workout/sport section
+        
         gbc.gridy = 6;
         gbc.gridwidth = 2;
         gbc.gridx = 0;
         inputPanel.add(new JSeparator(), gbc);
         
-        // Workout/Sport section header
+        
         gbc.gridy = 7;
         inputPanel.add(new JLabel("Workout & Sport Tracking:"), gbc);
         
-        // Category dropdown
+        
         gbc.gridwidth = 1;
         gbc.gridy = 8;
         gbc.gridx = 0;
@@ -204,7 +194,7 @@ public class FitnessPanel extends BasePanel {
         });
         inputPanel.add(categoryComboBox, gbc);
         
-        // Activity dropdown
+        
         gbc.gridy = 9;
         gbc.gridx = 0;
         inputPanel.add(new JLabel("Activity:"), gbc);
@@ -219,7 +209,6 @@ public class FitnessPanel extends BasePanel {
         });
         inputPanel.add(activityComboBox, gbc);
         
-        // Reps field (for workouts)
         gbc.gridy = 10;
         gbc.gridx = 0;
         repsLabel = new JLabel("Reps:");
@@ -230,7 +219,6 @@ public class FitnessPanel extends BasePanel {
         repsField.setVisible(false);
         inputPanel.add(repsField, gbc);
         
-        // Time field (for sports)
         gbc.gridy = 11;
         gbc.gridx = 0;
         timeLabel = new JLabel("Time (minutes):");
@@ -241,7 +229,6 @@ public class FitnessPanel extends BasePanel {
         timeField.setVisible(false);
         inputPanel.add(timeField, gbc);
         
-        // Distance field (for running)
         gbc.gridy = 12;
         gbc.gridx = 0;
         distanceLabel = new JLabel("Distance (km):");
@@ -252,7 +239,6 @@ public class FitnessPanel extends BasePanel {
         distanceField.setVisible(false);
         inputPanel.add(distanceField, gbc);
         
-        // Speed field (for running)
         gbc.gridy = 13;
         gbc.gridx = 0;
         speedLabel = new JLabel("Speed (km/h):");
@@ -263,7 +249,6 @@ public class FitnessPanel extends BasePanel {
         speedField.setVisible(false);
         inputPanel.add(speedField, gbc);
         
-        // Manual activity name field (for manual entry)
         gbc.gridy = 14;
         gbc.gridx = 0;
         manualActivityLabel = new JLabel("Activity Name:");
@@ -274,7 +259,6 @@ public class FitnessPanel extends BasePanel {
         manualActivityField.setVisible(false);
         inputPanel.add(manualActivityField, gbc);
         
-        // Manual calories field (for manual entry)
         gbc.gridy = 15;
         gbc.gridx = 0;
         manualCaloriesLabel = new JLabel("Calories:");
@@ -285,14 +269,12 @@ public class FitnessPanel extends BasePanel {
         manualCaloriesField.setVisible(false);
         inputPanel.add(manualCaloriesField, gbc);
         
-        // Calculate and Update Calories button
         gbc.gridy = 16;
         gbc.gridwidth = 2;
         gbc.gridx = 0;
         AnimatedButton calculateButton = new AnimatedButton("Calculate and Update Calories");
         inputPanel.add(calculateButton, gbc);
         
-        // Calories result label
         gbc.gridy = 17;
         gbc.gridwidth = 2;
         gbc.gridx = 0;
@@ -301,7 +283,6 @@ public class FitnessPanel extends BasePanel {
         caloriesResultLabel.setForeground(new Color(76, 175, 80));
         inputPanel.add(caloriesResultLabel, gbc);
         
-        // Separator before targets
         gbc.gridy = 18;
         inputPanel.add(new JSeparator(), gbc);
         
@@ -323,7 +304,6 @@ public class FitnessPanel extends BasePanel {
         targetCaloriesField.setText(String.valueOf(fitnessData.getTargetCalories()));
         inputPanel.add(targetCaloriesField, gbc);
         
-        // Buttons with animations
         JPanel buttonPanel = new JPanel(new FlowLayout());
         AnimatedButton updateTargetsButton = new AnimatedButton("Update Targets");
         buttonPanel.add(updateTargetsButton);
@@ -333,7 +313,6 @@ public class FitnessPanel extends BasePanel {
         gbc.gridwidth = 2;
         inputPanel.add(buttonPanel, gbc);
         
-        // Right panel - Activities list
         JPanel listPanel = new JPanel(new BorderLayout());
         listPanel.add(new JLabel("Fitness Today:"), BorderLayout.NORTH);
         
@@ -343,7 +322,6 @@ public class FitnessPanel extends BasePanel {
         JScrollPane listScrollPane = new JScrollPane(activitiesList);
         listPanel.add(listScrollPane, BorderLayout.CENTER);
         
-        // Remove Selected button
         JPanel buttonListPanel = new JPanel(new FlowLayout());
         AnimatedButton removeSelectedButton = new AnimatedButton("Remove Selected");
         removeSelectedButton.setButtonColors(new Color(244, 67, 54), new Color(211, 47, 47), new Color(198, 40, 40));
@@ -357,7 +335,6 @@ public class FitnessPanel extends BasePanel {
         
         updateActivitiesList();
         
-        // Event handlers
         addStepsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -554,7 +531,6 @@ public class FitnessPanel extends BasePanel {
                 return;
             }
             
-            // Handle Manual category
             if ("Manual".equals(category)) {
                 String activityName = manualActivityField.getText().trim();
                 if (activityName.isEmpty()) {
@@ -562,7 +538,6 @@ public class FitnessPanel extends BasePanel {
                         "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                // Validate activity name (alphabets and numbers only)
                 activityName = Validator.validateAlphabetsAndNumbers(activityName, "Activity Name");
                 String caloriesStr = manualCaloriesField.getText().trim();
                 if (caloriesStr.isEmpty()) {
@@ -573,55 +548,42 @@ public class FitnessPanel extends BasePanel {
                 caloriesBurned = Validator.parsePositiveDouble(caloriesStr, "Calories");
                 activity = activityName;
             } else {
-                // For Workout and Sport categories
                 if (activity == null || activity.startsWith("Select")) {
                     JOptionPane.showMessageDialog(this, "Please select an activity.", 
                         "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 
-                // Use weight from user data
                 double weightKg = user.getWeight();
                 
                 if ("Workout".equals(category)) {
                     caloriesBurned = calculateWorkoutCalories(activity, weightKg);
-                    // Get reps value (already validated by calculateWorkoutCalories)
                     String repsStr = repsField.getText().trim();
-                    // Format: "Activity Name (X reps)"
                     activity = activity + " (" + repsStr + " reps)";
                 } else if ("Sport".equals(category)) {
                     if (activity.startsWith("Running")) {
                         caloriesBurned = calculateRunningCalories(activity, weightKg);
-                        // Get time, distance, speed values (already validated by calculateRunningCalories)
                         String timeStr = timeField.getText().trim();
                         String distanceStr = distanceField.getText().trim();
                         String speedStr = speedField.getText().trim();
-                        // Format: "Running Type (X min, Y km, Z km/h)"
                         activity = activity + " (" + timeStr + " min, " + distanceStr + " km, " + speedStr + " km/h)";
                     } else {
                         caloriesBurned = calculateSportCalories(activity, weightKg);
-                        // Get time value (already validated by calculateSportCalories)
                         String timeStr = timeField.getText().trim();
-                        // Format: "Sport Name (X min)"
                         activity = activity + " (" + timeStr + " min)";
                     }
                 }
             }
             
-            // Update display
             caloriesResultLabel.setText(String.format("Calories Burned: %.2f kcal", caloriesBurned));
             
-            // Add activity to list (this also updates caloriesBurned in FitnessData)
             fitnessData.addActivity(activity, caloriesBurned);
             
-            // Save fitness data
             fileHandler.saveFitnessData(user.getUsername(), fitnessData);
             updateDisplay();
             
-            // Visual feedback
             animateSuccessFeedback();
             
-            // Scroll to bottom of activities list
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -631,7 +593,6 @@ public class FitnessPanel extends BasePanel {
                 }
             });
             
-            // Clear input fields
             if ("Manual".equals(category)) {
                 manualActivityField.setText("");
                 manualCaloriesField.setText("");
@@ -768,7 +729,6 @@ public class FitnessPanel extends BasePanel {
     }
     
     private void animateSuccessFeedback() {
-        // Flash effect on current stats labels
         Timer flashTimer = new Timer(50, new ActionListener() {
             private int count = 0;
             @Override
@@ -790,7 +750,6 @@ public class FitnessPanel extends BasePanel {
     
     @Override
     protected void updateDisplay() {
-        // Animate number changes
         animateNumberChange(currentStepsLabel, "Steps: ", fitnessData.getSteps());
         animateNumberChange(currentCaloriesLabel, "Calories Burned: ", fitnessData.getCaloriesBurned());
         updateActivitiesList();

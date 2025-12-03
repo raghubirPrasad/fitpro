@@ -2,18 +2,14 @@ package wellnessapp.models;
 
 import java.io.Serializable;
 
-/**
- * User class representing a user in the wellness app
- * Demonstrates: Classes, constructors, accessors, mutators, final fields
- */
 public class User implements Serializable, Comparable<User> {
     private String username;
     private String password;
     private String name;
     private int age;
     private String gender;
-    private final double height; // final field for immutability
-    private final double weight; // final field for immutability
+    private final double height;
+    private final double weight;
     
     public User(String username, String password, String name, int age, String gender, double height, double weight) {
         this.username = username;
@@ -25,7 +21,6 @@ public class User implements Serializable, Comparable<User> {
         this.weight = weight;
     }
     
-    // Accessors (getters)
     public String getUsername() {
         return username;
     }
@@ -54,7 +49,6 @@ public class User implements Serializable, Comparable<User> {
         return gender;
     }
     
-    // Mutators (setters)
     public void setUsername(String username) {
         this.username = username;
     }
@@ -63,7 +57,6 @@ public class User implements Serializable, Comparable<User> {
         this.password = password;
     }
     
-    // Comparable interface implementation
     @Override
     public int compareTo(User other) {
         return this.username.compareTo(other.username);
@@ -82,4 +75,3 @@ public class User implements Serializable, Comparable<User> {
         return "User{username='" + username + "', name='" + name + "', age=" + age + ", gender='" + gender + "', height=" + height + ", weight=" + weight + "}";
     }
 }
-

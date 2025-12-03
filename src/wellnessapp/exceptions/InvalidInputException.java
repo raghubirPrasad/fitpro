@@ -1,9 +1,5 @@
 package wellnessapp.exceptions;
 
-/**
- * Custom exception for invalid user input
- * Demonstrates user-defined exceptions
- */
 public class InvalidInputException extends Exception {
     private String message;
     
@@ -17,4 +13,3 @@ public class InvalidInputException extends Exception {
         return message;
     }
 }
-

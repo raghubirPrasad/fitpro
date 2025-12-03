@@ -1,9 +1,5 @@
 package wellnessapp.exceptions;
 
-/**
- * Exception thrown when a negative value is entered
- * Demonstrates: User-defined exceptions, specific exception types
- */
 public class NegativeValueException extends Exception {
     private String message;
     

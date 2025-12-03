@@ -4,10 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-/**
- * HabitTracker class to manage multiple habits
- * Demonstrates: ArrayList, Iterator, classes, constructors
- */
 public class HabitTracker implements Serializable {
     private ArrayList<Habit> habits;
     

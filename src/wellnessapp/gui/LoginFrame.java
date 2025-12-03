@@ -16,10 +16,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
 
-/**
- * LoginFrame for user authentication
- * Demonstrates: GUI components, event handling, action listeners
- */
 public class LoginFrame extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
@@ -38,12 +34,10 @@ public class LoginFrame extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
         
-        // Main panel
         JPanel mainPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         
-        // Username
         gbc.gridx = 0;
         gbc.gridy = 0;
         mainPanel.add(new JLabel("Username:"), gbc);
@@ -51,7 +45,6 @@ public class LoginFrame extends JFrame {
         usernameField = new JTextField(15);
         mainPanel.add(usernameField, gbc);
         
-        // Password
         gbc.gridx = 0;
         gbc.gridy = 1;
         mainPanel.add(new JLabel("Password:"), gbc);
@@ -59,7 +52,6 @@ public class LoginFrame extends JFrame {
         passwordField = new JPasswordField(15);
         mainPanel.add(passwordField, gbc);
         
-        // Buttons panel
         JPanel buttonPanel = new JPanel(new FlowLayout());
         loginButton = new JButton("Login");
         createUserButton = new JButton("Create User");
@@ -73,7 +65,6 @@ public class LoginFrame extends JFrame {
         
         add(mainPanel, BorderLayout.CENTER);
         
-        // Event handlers
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -118,13 +109,11 @@ public class LoginFrame extends JFrame {
         if (dialog.isUserCreated()) {
             User newUser = dialog.getCreatedUser();
             users.put(newUser.getUsername(), newUser);
-            // User stored in memory only - no persistence
             JOptionPane.showMessageDialog(this, "User created successfully!", 
                 "Success", JOptionPane.INFORMATION_MESSAGE);
         }
     }
     
-    // Inner class for create user dialog
     private class CreateUserDialog extends JDialog {
         private JTextField usernameField;
         private JPasswordField passwordField;
@@ -145,7 +134,6 @@ public class LoginFrame extends JFrame {
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.insets = new Insets(5, 5, 5, 5);
             
-            // Username
             gbc.gridx = 0;
             gbc.gridy = 0;
             add(new JLabel("Username:"), gbc);
@@ -153,7 +141,6 @@ public class LoginFrame extends JFrame {
             usernameField = new JTextField(15);
             add(usernameField, gbc);
             
-            // Password
             gbc.gridx = 0;
             gbc.gridy = 1;
             add(new JLabel("Password:"), gbc);
@@ -161,7 +148,6 @@ public class LoginFrame extends JFrame {
             passwordField = new JPasswordField(15);
             add(passwordField, gbc);
             
-            // Name
             gbc.gridx = 0;
             gbc.gridy = 2;
             add(new JLabel("Name:"), gbc);
@@ -169,7 +155,6 @@ public class LoginFrame extends JFrame {
             nameField = new JTextField(15);
             add(nameField, gbc);
             
-            // Age
             gbc.gridx = 0;
             gbc.gridy = 3;
             add(new JLabel("Age:"), gbc);
@@ -177,7 +162,6 @@ public class LoginFrame extends JFrame {
             ageField = new JTextField(15);
             add(ageField, gbc);
             
-            // Gender
             gbc.gridx = 0;
             gbc.gridy = 4;
             add(new JLabel("Gender:"), gbc);
@@ -186,7 +170,6 @@ public class LoginFrame extends JFrame {
             genderComboBox = new JComboBox<>(genders);
             add(genderComboBox, gbc);
             
-            // Height
             gbc.gridx = 0;
             gbc.gridy = 5;
             add(new JLabel("Height (cm):"), gbc);
@@ -194,7 +177,6 @@ public class LoginFrame extends JFrame {
             heightField = new JTextField(15);
             add(heightField, gbc);
             
-            // Weight
             gbc.gridx = 0;
             gbc.gridy = 6;
             add(new JLabel("Weight (kg):"), gbc);
@@ -202,7 +184,6 @@ public class LoginFrame extends JFrame {
             weightField = new JTextField(15);
             add(weightField, gbc);
             
-            // Buttons
             JPanel buttonPanel = new JPanel(new FlowLayout());
             JButton createButton = new JButton("Create");
             JButton cancelButton = new JButton("Cancel");
@@ -279,4 +260,3 @@ public class LoginFrame extends JFrame {
         }
     }
 }
-

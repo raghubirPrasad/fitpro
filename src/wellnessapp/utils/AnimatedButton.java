@@ -6,11 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-/**
- * AnimatedButton - Enhanced button with hover and click animations
- * Demonstrates: Custom components, mouse events, animations
- */
 public class AnimatedButton extends JButton {
     private Color normalColor;
     private Color hoverColor;
@@ -29,16 +24,14 @@ public class AnimatedButton extends JButton {
         setBackground(normalColor);
         setFocusPainted(false);
         setBorderPainted(false);
-        setOpaque(false); // For custom painting with shadows
+        setOpaque(false);
         setContentAreaFilled(false);
         
-        // Add subtle border
         setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createRaisedBevelBorder(),
             BorderFactory.createEmptyBorder(5, 15, 5, 15)
         ));
         
-        // Add hover effect
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -90,7 +83,6 @@ public class AnimatedButton extends JButton {
                     }
                 }
                 
-                // Trigger repaint to update button color (color interpolation done in paintComponent)
                 repaint();
             }
         });
@@ -102,13 +94,11 @@ public class AnimatedButton extends JButton {
         Graphics2D g2d = (Graphics2D) g.create();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         
-        // Interpolate color based on hover state
         int red = (int) (normalColor.getRed() + (hoverColor.getRed() - normalColor.getRed()) * hoverAlpha);
         int green = (int) (normalColor.getGreen() + (hoverColor.getGreen() - normalColor.getGreen()) * hoverAlpha);
         int blue = (int) (normalColor.getBlue() + (hoverColor.getBlue() - normalColor.getBlue()) * hoverAlpha);
         Color currentColor = new Color(red, green, blue);
         
-        // Draw subtle gradient
         GradientPaint gradient = new GradientPaint(
             0, 0, currentColor.brighter(),
             0, getHeight(), currentColor.darker()
@@ -116,7 +106,6 @@ public class AnimatedButton extends JButton {
         g2d.setPaint(gradient);
         g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
         
-        // Subtle shadow effect
         if (hoverAlpha > 0.3f) {
             g2d.setColor(new Color(0, 0, 0, (int)(30 * hoverAlpha)));
             g2d.fillRoundRect(2, 2, getWidth(), getHeight(), 8, 8);
@@ -124,7 +113,6 @@ public class AnimatedButton extends JButton {
             g2d.fillRoundRect(0, 0, getWidth() - 2, getHeight() - 2, 8, 8);
         }
         
-        // Draw text with subtle shadow
         g2d.setColor(new Color(0, 0, 0, 50));
         FontMetrics fm = g2d.getFontMetrics();
         int textX = (getWidth() - fm.stringWidth(getText())) / 2;

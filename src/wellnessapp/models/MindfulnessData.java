@@ -1,21 +1,16 @@
 package wellnessapp.models;
 
-/**
- * MindfulnessData class to track meditation time
- * Demonstrates: Classes, constructors, accessors, mutators, abstract class inheritance
- */
 public class MindfulnessData extends TrackingData {
-    private int meditationTime; // in minutes
-    private int targetMeditationTime; // in minutes
-    private String mood; // Current mood
+    private int meditationTime; 
+    private int targetMeditationTime;
+    private String mood;
     
     public MindfulnessData() {
         this.meditationTime = 0;
-        this.targetMeditationTime = 10; // Default 10 minutes
-        this.mood = ""; // No mood selected initially
+        this.targetMeditationTime = 10;
+        this.mood = ""; 
     }
     
-    // Accessors
     public int getMeditationTime() {
         return meditationTime;
     }
@@ -28,7 +23,6 @@ public class MindfulnessData extends TrackingData {
         return mood;
     }
     
-    // Mutators
     public void setMeditationTime(int meditationTime) {
         this.meditationTime = meditationTime;
     }

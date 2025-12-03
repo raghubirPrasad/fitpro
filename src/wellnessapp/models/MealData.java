@@ -2,27 +2,22 @@ package wellnessapp.models;
 
 import java.util.ArrayList;
 
-/**
- * MealData class to track meals and water intake
- * Demonstrates: Classes, ArrayList, constructors, accessors, mutators, abstract class inheritance
- */
 public class MealData extends ListTrackingData {
-    private int waterIntake; // in ml
+    private int waterIntake; 
     private int caloriesEaten;
-    private int targetWater; // in ml
+    private int targetWater; 
     private int targetCalories;
     
     public MealData() {
-        super(); // Initialize entries and totalCalories from ListTrackingData
+        super();
         this.waterIntake = 0;
         this.caloriesEaten = 0;
-        this.targetWater = 2000; // 2 liters default
+        this.targetWater = 2000; 
         this.targetCalories = 2000;
     }
     
-    // Accessors
     public ArrayList<String> getMeals() {
-        return entries; // Use entries from parent class
+        return entries; 
     }
     
     public int getWaterIntake() {
@@ -41,7 +36,6 @@ public class MealData extends ListTrackingData {
         return targetCalories;
     }
     
-    // Mutators
     public void addMeal(String meal, int calories) {
         addEntry(meal, calories);
     }
@@ -83,7 +77,7 @@ public class MealData extends ListTrackingData {
     
     @Override
     public void reset() {
-        super.reset(); // Clear entries and totalCalories
+        super.reset();
         this.waterIntake = 0;
         this.caloriesEaten = 0;
     }
@@ -98,4 +92,3 @@ public class MealData extends ListTrackingData {
         return targetCalories;
     }
 }
-

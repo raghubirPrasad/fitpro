@@ -17,10 +17,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/**
- * ProfilePanel for displaying and editing user profile and targets
- * Demonstrates: GUI components, data display, form editing, abstract class inheritance
- */
+
 public class ProfilePanel extends BasePanel {
     private FitnessData fitnessData;
     private MealData mealData;
@@ -42,10 +39,9 @@ public class ProfilePanel extends BasePanel {
     private JTextField targetMeditationTimeField;
     
     public ProfilePanel(User user) {
-        super(user); // Initialize BasePanel (sets user, fileHandler, layout, fade-in)
+        super(user);
         loadData();
         
-        // Title with subtle shadow
         JLabel titleLabel = new JLabel("Profile") {
             @Override
             protected void paintComponent(Graphics g) {

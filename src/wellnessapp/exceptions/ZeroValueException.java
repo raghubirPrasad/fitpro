@@ -1,9 +1,5 @@
 package wellnessapp.exceptions;
 
-/**
- * Exception thrown when a zero value is entered in fields that don't allow zero
- * Demonstrates: User-defined exceptions, specific exception types
- */
 public class ZeroValueException extends Exception {
     private String message;
     

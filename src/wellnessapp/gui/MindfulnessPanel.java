@@ -27,10 +27,9 @@ public class MindfulnessPanel extends BasePanel {
     private JLabel currentMoodLabel;
     private JComboBox<String> moodComboBox;
     public MindfulnessPanel(User user) {
-        super(user); // Initialize BasePanel (sets user, fileHandler, layout, fade-in)
+        super(user);
         loadData();
         
-        // Title with subtle shadow
         JLabel titleLabel = new JLabel("Mindfulness & Meditation") {
             @Override
             protected void paintComponent(Graphics g) {
@@ -54,13 +53,11 @@ public class MindfulnessPanel extends BasePanel {
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         add(titleLabel, BorderLayout.NORTH);
         
-        // Main panel
         JPanel mainPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.anchor = GridBagConstraints.WEST;
         
-        // Current stats
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
@@ -77,11 +74,9 @@ public class MindfulnessPanel extends BasePanel {
         currentMoodLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         mainPanel.add(currentMoodLabel, gbc);
         
-        // Separator
         gbc.gridy = 3;
         mainPanel.add(new JSeparator(), gbc);
         
-        // Mood tracking section
         gbc.gridwidth = 1;
         gbc.gridy = 4;
         gbc.gridx = 0;
@@ -99,12 +94,10 @@ public class MindfulnessPanel extends BasePanel {
         });
         mainPanel.add(moodComboBox, gbc);
         
-        // Separator
         gbc.gridy = 5;
         gbc.gridwidth = 2;
         mainPanel.add(new JSeparator(), gbc);
         
-        // Add meditation time section
         gbc.gridwidth = 1;
         gbc.gridy = 6;
         gbc.gridx = 0;
@@ -113,7 +106,6 @@ public class MindfulnessPanel extends BasePanel {
         meditationTimeField = new JTextField(15);
         mainPanel.add(meditationTimeField, gbc);
         
-        // Add Meditation Time button
         gbc.gridy = 7;
         gbc.gridwidth = 2;
         gbc.gridx = 0;
@@ -121,11 +113,9 @@ public class MindfulnessPanel extends BasePanel {
         addMeditationButton.setButtonColors(new Color(156, 39, 176), new Color(142, 36, 170), new Color(123, 31, 162));
         mainPanel.add(addMeditationButton, gbc);
         
-        // Separator before targets
         gbc.gridy = 8;
         mainPanel.add(new JSeparator(), gbc);
         
-        // Targets section
         gbc.gridwidth = 1;
         gbc.gridy = 9;
         gbc.gridx = 0;
@@ -135,7 +125,6 @@ public class MindfulnessPanel extends BasePanel {
         targetMeditationTimeField.setText(String.valueOf(mindfulnessData.getTargetMeditationTime()));
         mainPanel.add(targetMeditationTimeField, gbc);
         
-        // Update Target button
         gbc.gridx = 0;
         gbc.gridy = 10;
         gbc.gridwidth = 2;
@@ -144,7 +133,6 @@ public class MindfulnessPanel extends BasePanel {
         
         add(mainPanel, BorderLayout.CENTER);
         
-        // Event handlers
         addMeditationButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

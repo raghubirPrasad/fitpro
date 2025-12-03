@@ -13,10 +13,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/**
- * Dashboard panel showing key metrics with animations
- * Demonstrates: GUI components, layout managers, animations, Timer class, abstract class inheritance
- */
 public class Dashboard extends BasePanel {
     private JLabel stepsLabel;
     private JLabel caloriesBurnedLabel;
@@ -31,7 +27,6 @@ public class Dashboard extends BasePanel {
     private JProgressBar habitsCompletedProgressBar;
     private JProgressBar mindfulnessProgressBar;
     
-    // Animation values
     private int animatedSteps = 0;
     private int animatedCaloriesBurned = 0;
     private int animatedWater = 0;
@@ -39,7 +34,6 @@ public class Dashboard extends BasePanel {
     private int animatedHabitsCompleted = 0;
     private int animatedMeditationTime = 0;
     
-    // Target values for animation
     private int targetSteps = 10000;
     private int targetCaloriesBurned = 500;
     private int targetWater = 2000;
@@ -53,7 +47,6 @@ public class Dashboard extends BasePanel {
         super(user); // Initialize BasePanel (sets user, fileHandler, layout, fade-in)
         loadData();
         
-        // Greeting message
         JLabel greetingLabel = new JLabel("Hello " + user.getName() + "!") {
             @Override
             protected void paintComponent(Graphics g) {
@@ -61,14 +54,12 @@ public class Dashboard extends BasePanel {
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
                 
-                // Draw text shadow
                 g2d.setColor(new Color(0, 0, 0, 30));
                 FontMetrics fm = g2d.getFontMetrics();
                 int textX = (getWidth() - fm.stringWidth(getText())) / 2;
                 int textY = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
                 g2d.drawString(getText(), textX + 2, textY + 2);
                 
-                // Draw main text
                 g2d.setColor(getForeground());
                 g2d.drawString(getText(), textX, textY);
                 
@@ -79,7 +70,6 @@ public class Dashboard extends BasePanel {
         greetingLabel.setFont(new Font("Arial", Font.BOLD, 18));
         greetingLabel.setForeground(new Color(33, 150, 243));
         
-        // Title with subtle shadow effect
         JLabel titleLabel = new JLabel("Dashboard") {
             @Override
             protected void paintComponent(Graphics g) {
@@ -87,14 +77,12 @@ public class Dashboard extends BasePanel {
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
                 
-                // Draw text shadow
                 g2d.setColor(new Color(0, 0, 0, 30));
                 FontMetrics fm = g2d.getFontMetrics();
                 int textX = (getWidth() - fm.stringWidth(getText())) / 2;
                 int textY = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
                 g2d.drawString(getText(), textX + 2, textY + 2);
                 
-                // Draw main text
                 g2d.setColor(getForeground());
                 g2d.drawString(getText(), textX, textY);
                 
@@ -104,7 +92,6 @@ public class Dashboard extends BasePanel {
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         
-        // Panel to hold greeting and title
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setOpaque(false);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
@@ -112,13 +99,11 @@ public class Dashboard extends BasePanel {
         headerPanel.add(titleLabel, BorderLayout.CENTER);
         add(headerPanel, BorderLayout.NORTH);
         
-        // Main panel using GridBagLayout to match FitnessPanel alignment
         JPanel mainPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 5, 10, 5);
         gbc.anchor = GridBagConstraints.WEST;
         
-        // Steps
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
@@ -136,7 +121,7 @@ public class Dashboard extends BasePanel {
         JPanel stepsValuePanel = (JPanel) stepsComponents[2];
         mainPanel.add(stepsValuePanel, gbc);
         
-        // Calories Burned
+        
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.WEST;
@@ -154,7 +139,7 @@ public class Dashboard extends BasePanel {
         JPanel caloriesBurnedValuePanel = (JPanel) caloriesBurnedComponents[2];
         mainPanel.add(caloriesBurnedValuePanel, gbc);
         
-        // Water Intake
+        
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.WEST;
@@ -172,7 +157,7 @@ public class Dashboard extends BasePanel {
         JPanel waterValuePanel = (JPanel) waterComponents[2];
         mainPanel.add(waterValuePanel, gbc);
         
-        // Calories Eaten
+        
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.WEST;
@@ -190,7 +175,7 @@ public class Dashboard extends BasePanel {
         JPanel caloriesEatenValuePanel = (JPanel) caloriesEatenComponents[2];
         mainPanel.add(caloriesEatenValuePanel, gbc);
         
-        // Habit Progress
+        
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.anchor = GridBagConstraints.WEST;
@@ -208,7 +193,7 @@ public class Dashboard extends BasePanel {
         JPanel habitsCompletedValuePanel = (JPanel) habitsCompletedComponents[2];
         mainPanel.add(habitsCompletedValuePanel, gbc);
         
-        // Mindfulness Meter
+        
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.anchor = GridBagConstraints.WEST;
@@ -580,4 +565,3 @@ public class Dashboard extends BasePanel {
         }
     }
 }
-

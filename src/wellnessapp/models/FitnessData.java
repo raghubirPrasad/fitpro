@@ -2,10 +2,7 @@ package wellnessapp.models;
 
 import java.util.ArrayList;
 
-/**
- * FitnessData class to track fitness activities
- * Demonstrates: Classes, constructors, accessors, mutators, ArrayList, abstract class inheritance
- */
+
 public class FitnessData extends ListTrackingData {
     private int steps;
     private int caloriesBurned;
@@ -15,7 +12,7 @@ public class FitnessData extends ListTrackingData {
     private int targetCalories;
     
     public FitnessData() {
-        super(); // Initialize entries and totalCalories from ListTrackingData
+        super(); 
         this.steps = 0;
         this.caloriesBurned = 0;
         this.workoutType = "";
@@ -24,7 +21,6 @@ public class FitnessData extends ListTrackingData {
         this.targetCalories = 500;
     }
     
-    // Accessors
     public int getSteps() {
         return steps;
     }
@@ -50,7 +46,7 @@ public class FitnessData extends ListTrackingData {
     }
     
     public ArrayList<String> getActivities() {
-        return entries; // Use entries from parent class
+        return entries;
     }
     
     // Mutators
@@ -107,7 +103,7 @@ public class FitnessData extends ListTrackingData {
     
     @Override
     public void reset() {
-        super.reset(); // Clear entries and totalCalories
+        super.reset();
         this.steps = 0;
         this.caloriesBurned = 0;
         this.workoutType = "";

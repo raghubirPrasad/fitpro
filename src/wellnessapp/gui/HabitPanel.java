@@ -13,11 +13,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-/**
- * HabitPanel for tracking habits
- * Demonstrates: GUI components, event handling, Iterator usage, abstract class inheritance
- */
 public class HabitPanel extends BasePanel {
     private HabitTracker habitTracker;
     
@@ -26,10 +21,9 @@ public class HabitPanel extends BasePanel {
     private DefaultListModel<String> listModel;
     private JLabel completedLabel;
     public HabitPanel(User user) {
-        super(user); // Initialize BasePanel (sets user, fileHandler, layout, fade-in)
+        super(user);
         loadData();
         
-        // Title with subtle shadow
         JLabel titleLabel = new JLabel("Habit Tracking") {
             @Override
             protected void paintComponent(Graphics g) {
@@ -53,10 +47,8 @@ public class HabitPanel extends BasePanel {
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         add(titleLabel, BorderLayout.NORTH);
         
-        // Main panel
         JPanel mainPanel = new JPanel(new BorderLayout());
         
-        // Input panel
         JPanel inputPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -90,7 +82,6 @@ public class HabitPanel extends BasePanel {
         
         mainPanel.add(inputPanel, BorderLayout.NORTH);
         
-        // Habits list
         listModel = new DefaultListModel<String>();
         updateListModel();
         habitsList = new JList<String>(listModel);
@@ -100,7 +91,6 @@ public class HabitPanel extends BasePanel {
         
         add(mainPanel, BorderLayout.CENTER);
         
-        // Event handlers
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -132,7 +122,6 @@ public class HabitPanel extends BasePanel {
                 return;
             }
             
-            // Validate habit name (alphabets and numbers only)
             habitName = Validator.validateAlphabetsAndNumbers(habitName, "Habit Name");
             
             habitTracker.addHabit(habitName);
@@ -141,7 +130,6 @@ public class HabitPanel extends BasePanel {
             updateDisplay();
             habitNameField.setText("");
             
-            // Visual feedback - highlight new habit
             animateHabitAdded();
             
             JOptionPane.showMessageDialog(this, "Habit added successfully!", 
@@ -183,7 +171,6 @@ public class HabitPanel extends BasePanel {
     }
     
     private void animateHabitAdded() {
-        // Flash effect on completed label
         Timer flashTimer = new Timer(50, new ActionListener() {
             private int count = 0;
             @Override
@@ -260,4 +247,3 @@ public class HabitPanel extends BasePanel {
         }
     }
 }
-

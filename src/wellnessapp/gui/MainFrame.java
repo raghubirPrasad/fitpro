@@ -7,10 +7,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/**
- * MainFrame - main application window
- * Demonstrates: GUI components, layout managers, event handling, Composite pattern
- */
 public class MainFrame extends JFrame {
     private Dashboard dashboard;
     private FitnessPanel fitnessPanel;
@@ -27,7 +23,6 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         
-        // Create panels
         dashboard = new Dashboard(user);
         fitnessPanel = new FitnessPanel(user);
         mealPanel = new MealPanel(user);
@@ -36,14 +31,12 @@ public class MainFrame extends JFrame {
         calculatorPanel = new CalculatorPanel(user);
         profilePanel = new ProfilePanel(user);
         
-        // Navigation panel with animated buttons and subtle gradient
         JPanel navPanel = new JPanel(new FlowLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 
-                // Subtle gradient background
                 GradientPaint gradient = new GradientPaint(
                     0, 0, new Color(248, 248, 248),
                     0, getHeight(), new Color(240, 240, 240)
@@ -51,7 +44,6 @@ public class MainFrame extends JFrame {
                 g2d.setPaint(gradient);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
                 
-                // Subtle bottom border
                 g2d.setColor(new Color(200, 200, 200));
                 g2d.setStroke(new BasicStroke(1.0f));
                 g2d.drawLine(0, getHeight() - 1, getWidth(), getHeight() - 1);
@@ -78,7 +70,6 @@ public class MainFrame extends JFrame {
         navPanel.add(calculatorButton);
         navPanel.add(profileButton);
         
-        // Event handlers for navigation
         dashboardButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -136,7 +127,6 @@ public class MainFrame extends JFrame {
         setLayout(new BorderLayout());
         add(navPanel, BorderLayout.NORTH);
         
-        // Show dashboard by default
         showPanel(dashboard);
     }
     
@@ -150,4 +140,3 @@ public class MainFrame extends JFrame {
         repaint();
     }
 }
-

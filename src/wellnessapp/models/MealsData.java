@@ -2,17 +2,12 @@ package wellnessapp.models;
 
 import java.util.HashMap;
 
-/**
- * MealsData class to store all meal items organized by category
- * Demonstrates: HashMap, static data structures
- */
 public class MealsData {
     private static HashMap<String, HashMap<String, MealItem>> mealItems;
     
     static {
         mealItems = new HashMap<>();
         
-        // Breakfast items
         HashMap<String, MealItem> breakfast = new HashMap<>();
         breakfast.put("Scrambled Eggs", new MealItem("Scrambled Eggs", "2 eggs", 180));
         breakfast.put("Omelette", new MealItem("Omelette", "2 eggs", 200));
@@ -42,7 +37,6 @@ public class MealsData {
         breakfast.put("Porridge", new MealItem("Porridge", "1 bowl", 200));
         mealItems.put("Breakfast", breakfast);
         
-        // Lunch items
         HashMap<String, MealItem> lunch = new HashMap<>();
         lunch.put("Grilled Chicken", new MealItem("Grilled Chicken", "150g", 280));
         lunch.put("Chicken Curry", new MealItem("Chicken Curry", "1 bowl", 300));
@@ -71,7 +65,6 @@ public class MealsData {
         lunch.put("Tandoori Chicken", new MealItem("Tandoori Chicken", "2 pieces", 320));
         mealItems.put("Lunch", lunch);
         
-        // Dinner items
         HashMap<String, MealItem> dinner = new HashMap<>();
         dinner.put("Grilled Chicken Bowl", new MealItem("Grilled Chicken Bowl", "1 bowl", 350));
         dinner.put("Veg + Tofu Stir Fry", new MealItem("Veg + Tofu Stir Fry", "1 bowl", 280));
@@ -95,7 +88,6 @@ public class MealsData {
         dinner.put("Light Sandwich", new MealItem("Light Sandwich", "1 sandwich", 220));
         mealItems.put("Dinner", dinner);
         
-        // Snacks items
         HashMap<String, MealItem> snacks = new HashMap<>();
         snacks.put("Banana", new MealItem("Banana", "1 piece", 105));
         snacks.put("Apple", new MealItem("Apple", "1 piece", 95));

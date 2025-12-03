@@ -188,7 +188,6 @@ public class CalculatorPanel extends BasePanel {
         
         add(mainPanel, BorderLayout.CENTER);
         
-        // Event handlers
         calculateBMIButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -203,7 +202,6 @@ public class CalculatorPanel extends BasePanel {
             }
         });
         
-        // TDEE button handlers
         sedentaryButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -459,4 +457,3 @@ public class CalculatorPanel extends BasePanel {
         tdeeTimer.start();
     }
 }
-

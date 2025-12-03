@@ -20,19 +20,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 
-/**
- * MealPanel for tracking meals and water intake
- * Demonstrates: GUI components, event handling, HashMap usage, abstract class inheritance
- */
 public class MealPanel extends BasePanel {
     private MealData mealData;
     
-    // Water section
     private JTextField waterField;
     private JLabel currentWaterLabel;
     private JLabel currentCaloriesLabel;
     
-    // Meals section
     private JComboBox<String> categoryComboBox;
     private JComboBox<String> itemComboBox;
     private JTextField miscItemNameField;
@@ -43,19 +37,16 @@ public class MealPanel extends BasePanel {
     private JLabel caloriesLabel;
     private AnimatedButton addToTotalButton;
     
-    // Targets section
     private JTextField targetWaterField;
     private JTextField targetCaloriesField;
     
-    // Meals list
     private JList<String> mealsList;
     private DefaultListModel<String> mealsListModel;
     
     public MealPanel(User user) {
-        super(user); // Initialize BasePanel (sets user, fileHandler, layout, fade-in)
+        super(user);
         loadData();
         
-        // Title with subtle shadow
         JLabel titleLabel = new JLabel("Meal Tracking") {
             @Override
             protected void paintComponent(Graphics g) {
@@ -79,16 +70,16 @@ public class MealPanel extends BasePanel {
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         add(titleLabel, BorderLayout.NORTH);
         
-        // Main panel with two columns
+        
         JPanel mainPanel = new JPanel(new GridLayout(1, 2, 10, 10));
         
-        // Left panel - Input
+        
         JPanel inputPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.WEST;
         
-        // Current stats
+        
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
@@ -102,11 +93,11 @@ public class MealPanel extends BasePanel {
         currentCaloriesLabel = new JLabel("Calories: " + mealData.getCaloriesEaten() + " kcal");
         inputPanel.add(currentCaloriesLabel, gbc);
         
-        // Separator
+        
         gbc.gridy = 3;
         inputPanel.add(new JSeparator(), gbc);
         
-        // Add Water section
+        
         gbc.gridwidth = 1;
         gbc.gridy = 4;
         gbc.gridx = 0;
@@ -115,7 +106,7 @@ public class MealPanel extends BasePanel {
         waterField = new JTextField(10);
         inputPanel.add(waterField, gbc);
         
-        // Add Water button
+        
         gbc.gridy = 5;
         gbc.gridwidth = 2;
         gbc.gridx = 0;
@@ -123,15 +114,15 @@ public class MealPanel extends BasePanel {
         addWaterButton.setButtonColors(new Color(33, 150, 243), new Color(25, 118, 210), new Color(21, 101, 192));
         inputPanel.add(addWaterButton, gbc);
         
-        // Separator before meals section
+        
         gbc.gridy = 6;
         inputPanel.add(new JSeparator(), gbc);
         
-        // Meals section header
+        
         gbc.gridy = 7;
         inputPanel.add(new JLabel("Meal Selection:"), gbc);
         
-        // Category dropdown
+        
         gbc.gridwidth = 1;
         gbc.gridy = 8;
         gbc.gridx = 0;
@@ -146,7 +137,7 @@ public class MealPanel extends BasePanel {
         });
         inputPanel.add(categoryComboBox, gbc);
         
-        // Item dropdown
+        
         gbc.gridy = 9;
         gbc.gridx = 0;
         inputPanel.add(new JLabel("Item:"), gbc);
@@ -161,7 +152,7 @@ public class MealPanel extends BasePanel {
         });
         inputPanel.add(itemComboBox, gbc);
         
-        // Misc item name field
+        
         gbc.gridy = 10;
         gbc.gridx = 0;
         miscItemNameLabel = new JLabel("Item Name:");
@@ -186,7 +177,7 @@ public class MealPanel extends BasePanel {
         });
         inputPanel.add(miscItemNameField, gbc);
         
-        // Misc calories field
+        
         gbc.gridy = 11;
         gbc.gridx = 0;
         miscCaloriesLabel = new JLabel("Calories:");
@@ -211,7 +202,7 @@ public class MealPanel extends BasePanel {
         });
         inputPanel.add(miscCaloriesField, gbc);
         
-        // Serving size label
+        
         gbc.gridy = 12;
         gbc.gridwidth = 2;
         gbc.gridx = 0;
@@ -219,7 +210,7 @@ public class MealPanel extends BasePanel {
         servingSizeLabel.setVisible(false);
         inputPanel.add(servingSizeLabel, gbc);
         
-        // Calories label
+        
         gbc.gridy = 13;
         caloriesLabel = new JLabel("Calories: - kcal");
         caloriesLabel.setFont(new Font("Arial", Font.BOLD, 14));
@@ -227,17 +218,17 @@ public class MealPanel extends BasePanel {
         caloriesLabel.setVisible(false);
         inputPanel.add(caloriesLabel, gbc);
         
-        // Add to Total button
+        
         gbc.gridy = 14;
         addToTotalButton = new AnimatedButton("Add to Total");
         addToTotalButton.setEnabled(false);
         inputPanel.add(addToTotalButton, gbc);
         
-        // Separator before targets
+        
         gbc.gridy = 15;
         inputPanel.add(new JSeparator(), gbc);
         
-        // Targets section
+        
         gbc.gridwidth = 1;
         gbc.gridy = 16;
         gbc.gridx = 0;
@@ -255,14 +246,12 @@ public class MealPanel extends BasePanel {
         targetCaloriesField.setText(String.valueOf(mealData.getTargetCalories()));
         inputPanel.add(targetCaloriesField, gbc);
         
-        // Update Targets button
         gbc.gridx = 0;
         gbc.gridy = 18;
         gbc.gridwidth = 2;
         AnimatedButton updateTargetsButton = new AnimatedButton("Update Targets");
         inputPanel.add(updateTargetsButton, gbc);
         
-        // Right panel - Meals list
         JPanel listPanel = new JPanel(new BorderLayout());
         listPanel.add(new JLabel("Meals Today:"), BorderLayout.NORTH);
         
@@ -272,7 +261,6 @@ public class MealPanel extends BasePanel {
         JScrollPane listScrollPane = new JScrollPane(mealsList);
         listPanel.add(listScrollPane, BorderLayout.CENTER);
         
-        // Remove Selected button
         JPanel buttonListPanel = new JPanel(new FlowLayout());
         AnimatedButton removeSelectedButton = new AnimatedButton("Remove Selected");
         removeSelectedButton.setButtonColors(new Color(244, 67, 54), new Color(211, 47, 47), new Color(198, 40, 40));
@@ -292,7 +280,6 @@ public class MealPanel extends BasePanel {
         
         updateMealsList();
         
-        // Event handlers
         addWaterButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -447,7 +434,6 @@ public class MealPanel extends BasePanel {
                     return;
                 }
                 
-                // Validate item name (alphabets and numbers only)
                 miscName = Validator.validateAlphabetsAndNumbers(miscName, "Item Name");
                 
                 if (caloriesStr.isEmpty()) {
@@ -468,13 +454,13 @@ public class MealPanel extends BasePanel {
                 HashMap<String, MealItem> items = MealsData.getMealItems(category);
                 if (items != null) {
                     MealItem item = items.get(itemName);
-                    if (item != null) {
-                        calories = item.getCalories();
-                        // Format: "Item Name (Serving Size)" - calories will be added by addEntry()
+                        if (item != null) {
+                            calories = item.getCalories();
+                        
                         mealEntry = item.getName() + " (" + item.getServingSize() + ")";
+                        }
                     }
                 }
-            }
             
             if (calories > 0) {
                 mealData.addMeal(mealEntry, calories);
@@ -488,7 +474,6 @@ public class MealPanel extends BasePanel {
                 }
                 hideMealInfo();
                 
-                // Scroll to bottom
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
@@ -631,7 +616,6 @@ public class MealPanel extends BasePanel {
         }
     }
     
-    // Method to refresh data from storage (called when switching to this panel)
     public void refreshData() {
         MealData updatedData = fileHandler.loadMealData().get(user.getUsername());
         if (updatedData != null) {
