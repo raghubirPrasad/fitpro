@@ -7,6 +7,9 @@ import wellnessapp.utils.Validator;
 import wellnessapp.utils.FileHandler;
 import wellnessapp.utils.AnimatedButton;
 import wellnessapp.exceptions.InvalidInputException;
+import wellnessapp.exceptions.NegativeValueException;
+import wellnessapp.exceptions.DecimalValueException;
+import wellnessapp.exceptions.ZeroValueException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,11 +18,9 @@ import java.awt.event.ActionListener;
 
 /**
  * CalculatorPanel for health metric calculations
- * Demonstrates: GUI components, static methods, utility classes
+ * Demonstrates: GUI components, static methods, utility classes, abstract class inheritance
  */
-public class CalculatorPanel extends JPanel {
-    private User user;
-    private FileHandler fileHandler;
+public class CalculatorPanel extends BasePanel {
     
     private JTextField weightField;
     private JTextField heightField;
@@ -34,7 +35,6 @@ public class CalculatorPanel extends JPanel {
     private AnimatedButton activeButton;
     
     // Animation variables
-    private float alpha = 0.0f; // For fade-in effect
     private Timer bmiAnimationTimer;
     private Timer bmrAnimationTimer;
     private double animatedBMI = 0.0;
@@ -42,13 +42,8 @@ public class CalculatorPanel extends JPanel {
     private double animatedTDEE = 0.0;
     
     public CalculatorPanel(User user) {
-        this.user = user;
-        this.fileHandler = FileHandler.getInstance();
-        setLayout(new BorderLayout());
-        setOpaque(true);
-        
-        // Start fade-in animation
-        startFadeInAnimation();
+        super(user); // Initialize BasePanel (sets user, fileHandler, layout, fade-in)
+        loadData();
         
         // Title with subtle shadow
         JLabel titleLabel = new JLabel("Health Calculators") {
@@ -90,7 +85,8 @@ public class CalculatorPanel extends JPanel {
         gbc.gridwidth = 1;
         mainPanel.add(new JLabel("Weight (kg):"), gbc);
         gbc.gridx = 1;
-        weightField = new JTextField(10);
+        weightField = new JTextField(15);
+        weightField.setPreferredSize(new Dimension(150, 25));
         weightField.setText(String.valueOf(user.getWeight()));
         mainPanel.add(weightField, gbc);
         
@@ -98,7 +94,8 @@ public class CalculatorPanel extends JPanel {
         gbc.gridy = 2;
         mainPanel.add(new JLabel("Height (cm):"), gbc);
         gbc.gridx = 1;
-        heightField = new JTextField(10);
+        heightField = new JTextField(15);
+        heightField.setPreferredSize(new Dimension(150, 25));
         heightField.setText(String.valueOf(user.getHeight()));
         mainPanel.add(heightField, gbc);
         
@@ -126,7 +123,9 @@ public class CalculatorPanel extends JPanel {
         gbc.gridwidth = 1;
         mainPanel.add(new JLabel("Age:"), gbc);
         gbc.gridx = 1;
-        ageField = new JTextField(10);
+        ageField = new JTextField(15);
+        ageField.setPreferredSize(new Dimension(150, 25));
+        ageField.setText(String.valueOf(user.getAge()));
         mainPanel.add(ageField, gbc);
         
         gbc.gridx = 0;
@@ -134,8 +133,16 @@ public class CalculatorPanel extends JPanel {
         mainPanel.add(new JLabel("Gender:"), gbc);
         gbc.gridx = 1;
         JPanel genderPanel = new JPanel(new FlowLayout());
-        maleRadio = new JRadioButton("Male", true);
-        femaleRadio = new JRadioButton("Female");
+        // Pre-select gender based on user profile
+        String userGender = user.getGender();
+        boolean isMaleDefault = "Male".equalsIgnoreCase(userGender);
+        boolean isFemaleDefault = "Female".equalsIgnoreCase(userGender);
+        maleRadio = new JRadioButton("Male", isMaleDefault);
+        femaleRadio = new JRadioButton("Female", isFemaleDefault);
+        // If gender is "Other" or unknown, default to Male
+        if (!isMaleDefault && !isFemaleDefault) {
+            maleRadio.setSelected(true);
+        }
         ButtonGroup genderGroup = new ButtonGroup();
         genderGroup.add(maleRadio);
         genderGroup.add(femaleRadio);
@@ -219,28 +226,16 @@ public class CalculatorPanel extends JPanel {
         });
     }
     
-    private void startFadeInAnimation() {
-        alpha = 0.0f;
-        Timer fadeTimer = new Timer(20, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                alpha += 0.05f;
-                if (alpha >= 1.0f) {
-                    alpha = 1.0f;
-                    ((Timer) e.getSource()).stop();
-                }
-                repaint();
-            }
-        });
-        fadeTimer.start();
+    @Override
+    protected void loadData() {
+        // CalculatorPanel doesn't load specific data, just uses user data
+        // Weight, height, age are already in User object
     }
     
     @Override
-    protected void paintComponent(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g.create();
-        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-        super.paintComponent(g2d);
-        g2d.dispose();
+    protected void updateDisplay() {
+        // CalculatorPanel doesn't have a persistent display to update
+        // Results are calculated on demand
     }
     
     private void handleCalculateBMI() {
@@ -260,12 +255,12 @@ public class CalculatorPanel extends JPanel {
                 return;
             }
             
-            double weight = Validator.parsePositiveDouble(weightStr, "Weight");
-            double height = Validator.parsePositiveDouble(heightStr, "Height");
+            double weight = Validator.parsePositiveDoubleNoZero(weightStr, "Weight");
+            double height = Validator.parsePositiveDoubleNoZero(heightStr, "Height");
             
             double bmi = Calculator.calculateBMI(weight, height);
             animateBMI(bmi);
-        } catch (InvalidInputException e) {
+        } catch (InvalidInputException | NegativeValueException | ZeroValueException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), 
                 "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -286,15 +281,52 @@ public class CalculatorPanel extends JPanel {
                     if (Math.abs(targetBMI - animatedBMI) < 0.01) {
                         animatedBMI = targetBMI;
                     }
-                    bmiLabel.setText("BMI: " + String.format("%.2f", animatedBMI));
+                    String category = getBMICategory(animatedBMI);
+                    bmiLabel.setText("BMI: " + String.format("%.2f", animatedBMI) + " (" + category + ")");
+                    updateBMIColor(category);
                 } else {
                     animatedBMI = targetBMI;
-                    bmiLabel.setText("BMI: " + String.format("%.2f", animatedBMI));
+                    String category = getBMICategory(animatedBMI);
+                    bmiLabel.setText("BMI: " + String.format("%.2f", animatedBMI) + " (" + category + ")");
+                    updateBMIColor(category);
                     ((Timer) e.getSource()).stop();
                 }
             }
         });
         bmiAnimationTimer.start();
+    }
+    
+    private String getBMICategory(double bmi) {
+        if (bmi < 18.5) {
+            return "Underweight";
+        } else if (bmi < 25) {
+            return "Normal";
+        } else if (bmi < 30) {
+            return "Overweight";
+        } else {
+            return "Obese";
+        }
+    }
+    
+    private void updateBMIColor(String category) {
+        Color categoryColor;
+        switch (category) {
+            case "Underweight":
+                categoryColor = new Color(33, 150, 243); // Blue
+                break;
+            case "Normal":
+                categoryColor = new Color(76, 175, 80); // Green
+                break;
+            case "Overweight":
+                categoryColor = new Color(255, 193, 7); // Yellow/Orange
+                break;
+            case "Obese":
+                categoryColor = new Color(244, 67, 54); // Red
+                break;
+            default:
+                categoryColor = Color.BLACK;
+        }
+        bmiLabel.setForeground(categoryColor);
     }
     
     private void handleCalculateBMR() {
@@ -321,14 +353,14 @@ public class CalculatorPanel extends JPanel {
                 return;
             }
             
-            double weight = Validator.parsePositiveDouble(weightStr, "Weight");
-            double height = Validator.parsePositiveDouble(heightStr, "Height");
+            double weight = Validator.parsePositiveDoubleNoZero(weightStr, "Weight");
+            double height = Validator.parsePositiveDoubleNoZero(heightStr, "Height");
             int age = Validator.parsePositiveInteger(ageStr, "Age");
             boolean isMale = maleRadio.isSelected();
             
             double bmr = Calculator.calculateBMR(weight, height, age, isMale);
             animateBMR(bmr);
-        } catch (InvalidInputException e) {
+        } catch (InvalidInputException | NegativeValueException | DecimalValueException | ZeroValueException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), 
                 "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -346,9 +378,9 @@ public class CalculatorPanel extends JPanel {
                 return;
             }
             
-            double weight = Validator.parsePositiveDouble(weightStr, "Weight");
-            double height = Validator.parsePositiveDouble(heightStr, "Height");
-            int age = Validator.parsePositiveInteger(ageStr, "Age");
+            double weight = Validator.parsePositiveDoubleNoZero(weightStr, "Weight");
+            double height = Validator.parsePositiveDoubleNoZero(heightStr, "Height");
+            int age = Validator.parseAge(ageStr, "Age");
             boolean isMale = maleRadio.isSelected();
             
             // Calculate TDEE
@@ -371,7 +403,7 @@ public class CalculatorPanel extends JPanel {
             JOptionPane.showMessageDialog(this, 
                 "Target calories set to " + targetCalories + " cal/day (" + activityName + " activity level)", 
                 "Target Updated", JOptionPane.INFORMATION_MESSAGE);
-        } catch (InvalidInputException e) {
+        } catch (InvalidInputException | NegativeValueException | DecimalValueException | ZeroValueException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), 
                 "Error", JOptionPane.ERROR_MESSAGE);
         }

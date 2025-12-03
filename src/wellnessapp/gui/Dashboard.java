@@ -3,7 +3,10 @@ package wellnessapp.gui;
 import wellnessapp.models.User;
 import wellnessapp.models.FitnessData;
 import wellnessapp.models.MealData;
+import wellnessapp.models.HabitTracker;
+import wellnessapp.models.MindfulnessData;
 import wellnessapp.utils.FileHandler;
+import wellnessapp.utils.AnimatedButton;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,43 +15,69 @@ import java.awt.event.ActionListener;
 
 /**
  * Dashboard panel showing key metrics with animations
- * Demonstrates: GUI components, layout managers, animations, Timer class
+ * Demonstrates: GUI components, layout managers, animations, Timer class, abstract class inheritance
  */
-public class Dashboard extends JPanel {
+public class Dashboard extends BasePanel {
     private JLabel stepsLabel;
     private JLabel caloriesBurnedLabel;
     private JLabel waterIntakeLabel;
     private JLabel caloriesEatenLabel;
+    private JLabel habitsCompletedLabel;
+    private JLabel mindfulnessLabel;
     private JProgressBar stepsProgressBar;
     private JProgressBar caloriesBurnedProgressBar;
     private JProgressBar waterProgressBar;
     private JProgressBar caloriesEatenProgressBar;
-    private User user;
-    private FileHandler fileHandler;
+    private JProgressBar habitsCompletedProgressBar;
+    private JProgressBar mindfulnessProgressBar;
     
     // Animation values
     private int animatedSteps = 0;
     private int animatedCaloriesBurned = 0;
     private int animatedWater = 0;
     private int animatedCaloriesEaten = 0;
+    private int animatedHabitsCompleted = 0;
+    private int animatedMeditationTime = 0;
     
     // Target values for animation
     private int targetSteps = 10000;
     private int targetCaloriesBurned = 500;
     private int targetWater = 2000;
     private int targetCaloriesEaten = 2000;
+    private int targetHabits = 0;
+    private int targetMeditationTime = 10;
     
     private Timer animationTimer;
-    private float alpha = 0.0f; // For fade-in effect
     
     public Dashboard(User user) {
-        this.user = user;
-        this.fileHandler = FileHandler.getInstance();
-        setLayout(new BorderLayout());
-        setOpaque(true);
+        super(user); // Initialize BasePanel (sets user, fileHandler, layout, fade-in)
+        loadData();
         
-        // Start fade-in animation
-        startFadeInAnimation();
+        // Greeting message
+        JLabel greetingLabel = new JLabel("Hello " + user.getName() + "!") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                
+                // Draw text shadow
+                g2d.setColor(new Color(0, 0, 0, 30));
+                FontMetrics fm = g2d.getFontMetrics();
+                int textX = (getWidth() - fm.stringWidth(getText())) / 2;
+                int textY = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
+                g2d.drawString(getText(), textX + 2, textY + 2);
+                
+                // Draw main text
+                g2d.setColor(getForeground());
+                g2d.drawString(getText(), textX, textY);
+                
+                g2d.dispose();
+            }
+        };
+        greetingLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        greetingLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        greetingLabel.setForeground(new Color(33, 150, 243));
         
         // Title with subtle shadow effect
         JLabel titleLabel = new JLabel("Dashboard") {
@@ -74,7 +103,14 @@ public class Dashboard extends JPanel {
         };
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        add(titleLabel, BorderLayout.NORTH);
+        
+        // Panel to hold greeting and title
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setOpaque(false);
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
+        headerPanel.add(greetingLabel, BorderLayout.NORTH);
+        headerPanel.add(titleLabel, BorderLayout.CENTER);
+        add(headerPanel, BorderLayout.NORTH);
         
         // Main panel using GridBagLayout to match FitnessPanel alignment
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -154,9 +190,108 @@ public class Dashboard extends JPanel {
         JPanel caloriesEatenValuePanel = (JPanel) caloriesEatenComponents[2];
         mainPanel.add(caloriesEatenValuePanel, gbc);
         
+        // Habit Progress
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.NONE;
+        JLabel habitsCompletedNameLabel = new JLabel("Habit Progress:", JLabel.LEFT);
+        habitsCompletedNameLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        mainPanel.add(habitsCompletedNameLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.NONE;
+        Object[] habitsCompletedComponents = createMetricDisplay(10);
+        habitsCompletedLabel = (JLabel) habitsCompletedComponents[0];
+        habitsCompletedProgressBar = (JProgressBar) habitsCompletedComponents[1];
+        JPanel habitsCompletedValuePanel = (JPanel) habitsCompletedComponents[2];
+        mainPanel.add(habitsCompletedValuePanel, gbc);
+        
+        // Mindfulness Meter
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.NONE;
+        JLabel mindfulnessNameLabel = new JLabel("Mindfulness Meter:", JLabel.LEFT);
+        mindfulnessNameLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        mainPanel.add(mindfulnessNameLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.NONE;
+        Object[] mindfulnessComponents = createMetricDisplay(10);
+        mindfulnessLabel = (JLabel) mindfulnessComponents[0];
+        mindfulnessProgressBar = (JProgressBar) mindfulnessComponents[1];
+        JPanel mindfulnessValuePanel = (JPanel) mindfulnessComponents[2];
+        mainPanel.add(mindfulnessValuePanel, gbc);
+        
+        // New Day button
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(20, 10, 10, 10);
+        AnimatedButton newDayButton = new AnimatedButton("New Day");
+        newDayButton.setButtonColors(new Color(255, 152, 0), new Color(255, 193, 7), new Color(255, 143, 0));
+        newDayButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                handleNewDay();
+            }
+        });
+        mainPanel.add(newDayButton, gbc);
+        
         add(mainPanel, BorderLayout.CENTER);
         
         updateMetrics();
+    }
+    
+    private void handleNewDay() {
+        int confirm = JOptionPane.showConfirmDialog(this, 
+            "Reset all tracking data for a new day?\n\nThis will reset:\n- Fitness activities and calories\n- Meal entries and water intake\n- Habit completion status\n- Meditation time and mood", 
+            "Confirm New Day", 
+            JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            // Reset FitnessData
+            FitnessData fitnessData = fileHandler.loadFitnessData().get(user.getUsername());
+            if (fitnessData == null) {
+                fitnessData = new FitnessData();
+            }
+            fitnessData.reset();
+            fileHandler.saveFitnessData(user.getUsername(), fitnessData);
+            
+            // Reset MealData
+            MealData mealData = fileHandler.loadMealData().get(user.getUsername());
+            if (mealData == null) {
+                mealData = new MealData();
+            }
+            mealData.reset();
+            fileHandler.saveMealData(user.getUsername(), mealData);
+            
+            // Reset HabitTracker
+            HabitTracker habitTracker = fileHandler.loadHabitTrackers().get(user.getUsername());
+            if (habitTracker == null) {
+                habitTracker = new HabitTracker();
+            }
+            habitTracker.reset();
+            fileHandler.saveHabitTracker(user.getUsername(), habitTracker);
+            
+            // Reset MindfulnessData
+            MindfulnessData mindfulnessData = fileHandler.loadMindfulnessData().get(user.getUsername());
+            if (mindfulnessData == null) {
+                mindfulnessData = new MindfulnessData();
+            }
+            mindfulnessData.reset();
+            fileHandler.saveMindfulnessData(user.getUsername(), mindfulnessData);
+            
+            // Update dashboard display
+            updateMetrics();
+            
+            JOptionPane.showMessageDialog(this, "All data reset for new day!", 
+                "Success", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
     
     private Object[] createMetricDisplay(int maxValue) {
@@ -261,33 +396,22 @@ public class Dashboard extends JPanel {
         return new Object[] {valueLabel, progressBar, panel};
     }
     
-    private void startFadeInAnimation() {
-        alpha = 0.0f;
-        Timer fadeTimer = new Timer(20, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                alpha += 0.05f;
-                if (alpha >= 1.0f) {
-                    alpha = 1.0f;
-                    ((Timer) e.getSource()).stop();
-                }
-                repaint();
-            }
-        });
-        fadeTimer.start();
+    @Override
+    protected void loadData() {
+        // Dashboard loads data in updateMetrics() method instead
     }
     
     @Override
-    protected void paintComponent(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g.create();
-        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-        super.paintComponent(g2d);
-        g2d.dispose();
+    protected void updateDisplay() {
+        // Dashboard uses updateMetrics() method instead
+        updateMetrics();
     }
     
     public void updateMetrics() {
         FitnessData fitnessData = fileHandler.loadFitnessData().get(user.getUsername());
         MealData mealData = fileHandler.loadMealData().get(user.getUsername());
+        HabitTracker habitTracker = fileHandler.loadHabitTrackers().get(user.getUsername());
+        MindfulnessData mindfulnessData = fileHandler.loadMindfulnessData().get(user.getUsername());
         
         if (fitnessData == null) {
             fitnessData = new wellnessapp.models.FitnessData();
@@ -295,26 +419,43 @@ public class Dashboard extends JPanel {
         if (mealData == null) {
             mealData = new wellnessapp.models.MealData();
         }
+        if (habitTracker == null) {
+            habitTracker = new wellnessapp.models.HabitTracker();
+        }
+        if (mindfulnessData == null) {
+            mindfulnessData = new wellnessapp.models.MindfulnessData();
+        }
         
         // Get target values
         targetSteps = fitnessData.getTargetSteps();
         targetCaloriesBurned = fitnessData.getTargetCalories();
         targetWater = mealData.getTargetWater();
         targetCaloriesEaten = mealData.getTargetCalories();
+        targetHabits = habitTracker.getHabits().size();
+        if (targetHabits == 0) {
+            targetHabits = 1; // Avoid division by zero
+        }
+        targetMeditationTime = mindfulnessData.getTargetMeditationTime();
+        if (targetMeditationTime == 0) {
+            targetMeditationTime = 10; // Default to 10 minutes if not set
+        }
         
         // Update progress bar maximums
         stepsProgressBar.setMaximum(targetSteps);
         caloriesBurnedProgressBar.setMaximum(targetCaloriesBurned);
         waterProgressBar.setMaximum(targetWater);
         caloriesEatenProgressBar.setMaximum(targetCaloriesEaten);
+        habitsCompletedProgressBar.setMaximum(targetHabits);
+        mindfulnessProgressBar.setMaximum(targetMeditationTime);
         
         // Start counting animation
         animateToValue(fitnessData.getSteps(), fitnessData.getCaloriesBurned(), 
-                      mealData.getWaterIntake(), mealData.getCaloriesEaten());
+                      mealData.getWaterIntake(), mealData.getCaloriesEaten(),
+                      habitTracker.getCompletedCount(), mindfulnessData.getMeditationTime());
     }
     
     private void animateToValue(int targetSteps, int targetCaloriesBurned, 
-                               int targetWater, int targetCaloriesEaten) {
+                               int targetWater, int targetCaloriesEaten, int targetHabitsCompleted, int targetMeditationTime) {
         // Stop existing animation if running
         if (animationTimer != null && animationTimer.isRunning()) {
             animationTimer.stop();
@@ -366,8 +507,28 @@ public class Dashboard extends JPanel {
                     animatedCaloriesEaten = targetCaloriesEaten;
                 }
                 
+                // Animate habits completed
+                if (animatedHabitsCompleted < targetHabitsCompleted) {
+                    int diff = targetHabitsCompleted - animatedHabitsCompleted;
+                    animatedHabitsCompleted += Math.max(1, diff / 20);
+                    if (animatedHabitsCompleted > targetHabitsCompleted) animatedHabitsCompleted = targetHabitsCompleted;
+                    stillAnimating = true;
+                } else if (animatedHabitsCompleted > targetHabitsCompleted) {
+                    animatedHabitsCompleted = targetHabitsCompleted;
+                }
+                
+                // Animate meditation time
+                if (animatedMeditationTime < targetMeditationTime) {
+                    int diff = targetMeditationTime - animatedMeditationTime;
+                    animatedMeditationTime += Math.max(1, diff / 20);
+                    if (animatedMeditationTime > targetMeditationTime) animatedMeditationTime = targetMeditationTime;
+                    stillAnimating = true;
+                } else if (animatedMeditationTime > targetMeditationTime) {
+                    animatedMeditationTime = targetMeditationTime;
+                }
+                
                 // Update display
-                updateDisplay();
+                updateDisplayInternal();
                 
                 // Stop if done
                 if (!stillAnimating) {
@@ -378,18 +539,22 @@ public class Dashboard extends JPanel {
         animationTimer.start();
     }
     
-    private void updateDisplay() {
+    private void updateDisplayInternal() {
         // Update labels with proper formatting
         stepsLabel.setText(String.format("%d / %d", animatedSteps, targetSteps));
         caloriesBurnedLabel.setText(String.format("%d / %d", animatedCaloriesBurned, targetCaloriesBurned));
         waterIntakeLabel.setText(String.format("%d ml / %d ml", animatedWater, targetWater));
         caloriesEatenLabel.setText(String.format("%d / %d", animatedCaloriesEaten, targetCaloriesEaten));
+        habitsCompletedLabel.setText(String.format("%d / %d", animatedHabitsCompleted, targetHabits));
+        mindfulnessLabel.setText(String.format("%d min / %d min", animatedMeditationTime, targetMeditationTime));
         
         // Update progress bars with color coding
         updateProgressBar(stepsProgressBar, animatedSteps, targetSteps);
         updateProgressBar(caloriesBurnedProgressBar, animatedCaloriesBurned, targetCaloriesBurned);
         updateProgressBar(waterProgressBar, animatedWater, targetWater);
         updateProgressBar(caloriesEatenProgressBar, animatedCaloriesEaten, targetCaloriesEaten);
+        updateProgressBar(habitsCompletedProgressBar, animatedHabitsCompleted, targetHabits);
+        updateProgressBar(mindfulnessProgressBar, animatedMeditationTime, targetMeditationTime);
     }
     
     private void updateProgressBar(JProgressBar progressBar, int current, int target) {

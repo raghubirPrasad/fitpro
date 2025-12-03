@@ -16,11 +16,13 @@ public class MainFrame extends JFrame {
     private FitnessPanel fitnessPanel;
     private MealPanel mealPanel;
     private HabitPanel habitPanel;
+    private MindfulnessPanel mindfulnessPanel;
     private CalculatorPanel calculatorPanel;
+    private ProfilePanel profilePanel;
     private JPanel currentPanel;
     
     public MainFrame(User user) {
-        setTitle("Wellness App - " + user.getUsername());
+        setTitle("FitPro: The Ultimate Wellness App - " + user.getUsername());
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -30,7 +32,9 @@ public class MainFrame extends JFrame {
         fitnessPanel = new FitnessPanel(user);
         mealPanel = new MealPanel(user);
         habitPanel = new HabitPanel(user);
+        mindfulnessPanel = new MindfulnessPanel(user);
         calculatorPanel = new CalculatorPanel(user);
+        profilePanel = new ProfilePanel(user);
         
         // Navigation panel with animated buttons and subtle gradient
         JPanel navPanel = new JPanel(new FlowLayout()) {
@@ -62,16 +66,17 @@ public class MainFrame extends JFrame {
         wellnessapp.utils.AnimatedButton fitnessButton = new wellnessapp.utils.AnimatedButton("Fitness");
         wellnessapp.utils.AnimatedButton mealButton = new wellnessapp.utils.AnimatedButton("Meals");
         wellnessapp.utils.AnimatedButton habitButton = new wellnessapp.utils.AnimatedButton("Habits");
+        wellnessapp.utils.AnimatedButton mindfulnessButton = new wellnessapp.utils.AnimatedButton("Mindfulness");
         wellnessapp.utils.AnimatedButton calculatorButton = new wellnessapp.utils.AnimatedButton("Calculators");
-        wellnessapp.utils.AnimatedButton logoutButton = new wellnessapp.utils.AnimatedButton("Logout");
-        logoutButton.setButtonColors(new Color(244, 67, 54), new Color(211, 47, 47), new Color(198, 40, 40));
+        wellnessapp.utils.AnimatedButton profileButton = new wellnessapp.utils.AnimatedButton("Profile");
         
         navPanel.add(dashboardButton);
         navPanel.add(fitnessButton);
         navPanel.add(mealButton);
         navPanel.add(habitButton);
+        navPanel.add(mindfulnessButton);
         navPanel.add(calculatorButton);
-        navPanel.add(logoutButton);
+        navPanel.add(profileButton);
         
         // Event handlers for navigation
         dashboardButton.addActionListener(new ActionListener() {
@@ -85,6 +90,7 @@ public class MainFrame extends JFrame {
         fitnessButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                fitnessPanel.refreshData();
                 showPanel(fitnessPanel);
             }
         });
@@ -92,6 +98,7 @@ public class MainFrame extends JFrame {
         mealButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                mealPanel.refreshData();
                 showPanel(mealPanel);
             }
         });
@@ -103,6 +110,14 @@ public class MainFrame extends JFrame {
             }
         });
         
+        mindfulnessButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mindfulnessPanel.refreshData();
+                showPanel(mindfulnessPanel);
+            }
+        });
+        
         calculatorButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -110,11 +125,11 @@ public class MainFrame extends JFrame {
             }
         });
         
-        logoutButton.addActionListener(new ActionListener() {
+        profileButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                dispose();
-                new LoginFrame().setVisible(true);
+                profilePanel.refreshData();
+                showPanel(profilePanel);
             }
         });
         

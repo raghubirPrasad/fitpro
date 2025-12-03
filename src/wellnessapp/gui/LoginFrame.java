@@ -4,6 +4,11 @@ import wellnessapp.models.User;
 import wellnessapp.utils.FileHandler;
 import wellnessapp.utils.Validator;
 import wellnessapp.exceptions.InvalidInputException;
+import wellnessapp.exceptions.NegativeValueException;
+import wellnessapp.exceptions.DecimalValueException;
+import wellnessapp.exceptions.NumericValueException;
+import wellnessapp.exceptions.SpecialCharacterException;
+import wellnessapp.exceptions.ZeroValueException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -113,7 +118,7 @@ public class LoginFrame extends JFrame {
         if (dialog.isUserCreated()) {
             User newUser = dialog.getCreatedUser();
             users.put(newUser.getUsername(), newUser);
-            fileHandler.saveUsers(users);
+            // User stored in memory only - no persistence
             JOptionPane.showMessageDialog(this, "User created successfully!", 
                 "Success", JOptionPane.INFORMATION_MESSAGE);
         }
@@ -123,6 +128,9 @@ public class LoginFrame extends JFrame {
     private class CreateUserDialog extends JDialog {
         private JTextField usernameField;
         private JPasswordField passwordField;
+        private JTextField nameField;
+        private JTextField ageField;
+        private JComboBox<String> genderComboBox;
         private JTextField heightField;
         private JTextField weightField;
         private boolean userCreated;
@@ -130,7 +138,7 @@ public class LoginFrame extends JFrame {
         
         public CreateUserDialog(JFrame parent) {
             super(parent, "Create New User", true);
-            setSize(350, 250);
+            setSize(350, 400);
             setLocationRelativeTo(parent);
             setLayout(new GridBagLayout());
             
@@ -153,9 +161,34 @@ public class LoginFrame extends JFrame {
             passwordField = new JPasswordField(15);
             add(passwordField, gbc);
             
-            // Height
+            // Name
             gbc.gridx = 0;
             gbc.gridy = 2;
+            add(new JLabel("Name:"), gbc);
+            gbc.gridx = 1;
+            nameField = new JTextField(15);
+            add(nameField, gbc);
+            
+            // Age
+            gbc.gridx = 0;
+            gbc.gridy = 3;
+            add(new JLabel("Age:"), gbc);
+            gbc.gridx = 1;
+            ageField = new JTextField(15);
+            add(ageField, gbc);
+            
+            // Gender
+            gbc.gridx = 0;
+            gbc.gridy = 4;
+            add(new JLabel("Gender:"), gbc);
+            gbc.gridx = 1;
+            String[] genders = {"Male", "Female"};
+            genderComboBox = new JComboBox<>(genders);
+            add(genderComboBox, gbc);
+            
+            // Height
+            gbc.gridx = 0;
+            gbc.gridy = 5;
             add(new JLabel("Height (cm):"), gbc);
             gbc.gridx = 1;
             heightField = new JTextField(15);
@@ -163,7 +196,7 @@ public class LoginFrame extends JFrame {
             
             // Weight
             gbc.gridx = 0;
-            gbc.gridy = 3;
+            gbc.gridy = 6;
             add(new JLabel("Weight (kg):"), gbc);
             gbc.gridx = 1;
             weightField = new JTextField(15);
@@ -177,7 +210,7 @@ public class LoginFrame extends JFrame {
             buttonPanel.add(cancelButton);
             
             gbc.gridx = 0;
-            gbc.gridy = 4;
+            gbc.gridy = 7;
             gbc.gridwidth = 2;
             add(buttonPanel, gbc);
             
@@ -189,15 +222,20 @@ public class LoginFrame extends JFrame {
                     try {
                         String username = usernameField.getText().trim();
                         String password = new String(passwordField.getPassword());
+                        String name = nameField.getText().trim();
+                        String ageStr = ageField.getText().trim();
+                        String gender = (String) genderComboBox.getSelectedItem();
                         String heightStr = heightField.getText().trim();
                         String weightStr = weightField.getText().trim();
                         
-                        if (username.isEmpty() || password.isEmpty() || 
-                            heightStr.isEmpty() || weightStr.isEmpty()) {
+                        if (password.isEmpty() || ageStr.isEmpty() || heightStr.isEmpty() || weightStr.isEmpty()) {
                             JOptionPane.showMessageDialog(CreateUserDialog.this, 
                                 "All fields are required", "Error", JOptionPane.ERROR_MESSAGE);
                             return;
                         }
+                        
+                        // Validate username (alphabets, numbers, underscore only)
+                        username = Validator.validateUsername(username, "Username");
                         
                         if (users.containsKey(username)) {
                             JOptionPane.showMessageDialog(CreateUserDialog.this, 
@@ -205,13 +243,19 @@ public class LoginFrame extends JFrame {
                             return;
                         }
                         
-                        double height = Validator.parsePositiveDouble(heightStr, "Height");
-                        double weight = Validator.parsePositiveDouble(weightStr, "Weight");
+                        // Validate name (alphabets only)
+                        name = Validator.validateName(name, "Name");
                         
-                        createdUser = new User(username, password, height, weight);
+                        // Validate age (no decimals, no negatives, no zero)
+                        int age = Validator.parseAge(ageStr, "Age");
+                        double height = Validator.parsePositiveDoubleNoZero(heightStr, "Height");
+                        double weight = Validator.parsePositiveDoubleNoZero(weightStr, "Weight");
+                        
+                        createdUser = new User(username, password, name, age, gender, height, weight);
                         userCreated = true;
                         dispose();
-                    } catch (InvalidInputException ex) {
+                    } catch (InvalidInputException | NegativeValueException | DecimalValueException | 
+                             NumericValueException | SpecialCharacterException | ZeroValueException ex) {
                         JOptionPane.showMessageDialog(CreateUserDialog.this, 
                             ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     }

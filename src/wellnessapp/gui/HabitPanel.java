@@ -5,6 +5,9 @@ import wellnessapp.models.Habit;
 import wellnessapp.models.HabitTracker;
 import wellnessapp.utils.FileHandler;
 import wellnessapp.utils.AnimatedButton;
+import wellnessapp.utils.Validator;
+import wellnessapp.exceptions.InvalidInputException;
+import wellnessapp.exceptions.SpecialCharacterException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,29 +16,18 @@ import java.awt.event.ActionListener;
 
 /**
  * HabitPanel for tracking habits
- * Demonstrates: GUI components, event handling, Iterator usage
+ * Demonstrates: GUI components, event handling, Iterator usage, abstract class inheritance
  */
-public class HabitPanel extends JPanel {
-    private User user;
-    private FileHandler fileHandler;
+public class HabitPanel extends BasePanel {
     private HabitTracker habitTracker;
     
     private JTextField habitNameField;
     private JList<String> habitsList;
     private DefaultListModel<String> listModel;
     private JLabel completedLabel;
-    private float alpha = 0.0f; // For fade-in effect
-    
     public HabitPanel(User user) {
-        this.user = user;
-        this.fileHandler = FileHandler.getInstance();
+        super(user); // Initialize BasePanel (sets user, fileHandler, layout, fade-in)
         loadData();
-        
-        setLayout(new BorderLayout());
-        setOpaque(true);
-        
-        // Start fade-in animation
-        startFadeInAnimation();
         
         // Title with subtle shadow
         JLabel titleLabel = new JLabel("Habit Tracking") {
@@ -82,12 +74,9 @@ public class HabitPanel extends JPanel {
         toggleButton.setButtonColors(new Color(76, 175, 80), new Color(56, 142, 60), new Color(46, 125, 50));
         AnimatedButton removeButton = new AnimatedButton("Remove Selected");
         removeButton.setButtonColors(new Color(244, 67, 54), new Color(211, 47, 47), new Color(198, 40, 40));
-        AnimatedButton newDayButton = new AnimatedButton("New Day");
-        newDayButton.setButtonColors(new Color(255, 152, 0), new Color(255, 193, 7), new Color(255, 143, 0));
         buttonPanel.add(addButton);
         buttonPanel.add(toggleButton);
         buttonPanel.add(removeButton);
-        buttonPanel.add(newDayButton);
         
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -132,58 +121,35 @@ public class HabitPanel extends JPanel {
                 handleRemoveHabit();
             }
         });
-        
-        newDayButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                handleNewDay();
-            }
-        });
-    }
-    
-    private void startFadeInAnimation() {
-        alpha = 0.0f;
-        Timer fadeTimer = new Timer(20, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                alpha += 0.05f;
-                if (alpha >= 1.0f) {
-                    alpha = 1.0f;
-                    ((Timer) e.getSource()).stop();
-                }
-                repaint();
-            }
-        });
-        fadeTimer.start();
-    }
-    
-    @Override
-    protected void paintComponent(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g.create();
-        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-        super.paintComponent(g2d);
-        g2d.dispose();
     }
     
     private void handleAddHabit() {
-        String habitName = habitNameField.getText().trim();
-        if (habitName.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter habit name", 
+        try {
+            String habitName = habitNameField.getText().trim();
+            if (habitName.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter habit name", 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            // Validate habit name (alphabets and numbers only)
+            habitName = Validator.validateAlphabetsAndNumbers(habitName, "Habit Name");
+            
+            habitTracker.addHabit(habitName);
+            fileHandler.saveHabitTracker(user.getUsername(), habitTracker);
+            
+            updateDisplay();
+            habitNameField.setText("");
+            
+            // Visual feedback - highlight new habit
+            animateHabitAdded();
+            
+            JOptionPane.showMessageDialog(this, "Habit added successfully!", 
+                "Success", JOptionPane.INFORMATION_MESSAGE);
+        } catch (InvalidInputException | SpecialCharacterException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), 
                 "Error", JOptionPane.ERROR_MESSAGE);
-            return;
         }
-        
-        habitTracker.addHabit(habitName);
-        fileHandler.saveHabitTracker(user.getUsername(), habitTracker);
-        
-        updateDisplay();
-        habitNameField.setText("");
-        
-        // Visual feedback - highlight new habit
-        animateHabitAdded();
-        
-        JOptionPane.showMessageDialog(this, "Habit added successfully!", 
-            "Success", JOptionPane.INFORMATION_MESSAGE);
     }
     
     private void handleToggleHabit() {
@@ -216,19 +182,6 @@ public class HabitPanel extends JPanel {
         updateDisplay();
     }
     
-    private void handleNewDay() {
-        int confirm = JOptionPane.showConfirmDialog(this, 
-            "Reset all habits for a new day?", "Confirm", 
-            JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) {
-            habitTracker.reset();
-            fileHandler.saveHabitTracker(user.getUsername(), habitTracker);
-            updateDisplay();
-            JOptionPane.showMessageDialog(this, "Habits reset for new day!", 
-                "Success", JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
-    
     private void animateHabitAdded() {
         // Flash effect on completed label
         Timer flashTimer = new Timer(50, new ActionListener() {
@@ -248,7 +201,8 @@ public class HabitPanel extends JPanel {
         flashTimer.start();
     }
     
-    private void updateDisplay() {
+    @Override
+    protected void updateDisplay() {
         updateListModel();
         animateNumberChange(completedLabel, "Completed: ", habitTracker.getCompletedCount(), 
             " / " + habitTracker.getHabits().size());
@@ -298,7 +252,8 @@ public class HabitPanel extends JPanel {
         }
     }
     
-    private void loadData() {
+    @Override
+    protected void loadData() {
         habitTracker = fileHandler.loadHabitTrackers().get(user.getUsername());
         if (habitTracker == null) {
             habitTracker = new HabitTracker();

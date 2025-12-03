@@ -9,12 +9,18 @@ import java.io.Serializable;
 public class User implements Serializable, Comparable<User> {
     private String username;
     private String password;
+    private String name;
+    private int age;
+    private String gender;
     private final double height; // final field for immutability
     private final double weight; // final field for immutability
     
-    public User(String username, String password, double height, double weight) {
+    public User(String username, String password, String name, int age, String gender, double height, double weight) {
         this.username = username;
         this.password = password;
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
         this.height = height;
         this.weight = weight;
     }
@@ -34,6 +40,18 @@ public class User implements Serializable, Comparable<User> {
     
     public double getWeight() {
         return weight;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public int getAge() {
+        return age;
+    }
+    
+    public String getGender() {
+        return gender;
     }
     
     // Mutators (setters)
@@ -61,7 +79,7 @@ public class User implements Serializable, Comparable<User> {
     
     @Override
     public String toString() {
-        return "User{username='" + username + "', height=" + height + ", weight=" + weight + "}";
+        return "User{username='" + username + "', name='" + name + "', age=" + age + ", gender='" + gender + "', height=" + height + ", weight=" + weight + "}";
     }
 }
 

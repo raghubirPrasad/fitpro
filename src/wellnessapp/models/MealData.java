@@ -1,21 +1,19 @@
 package wellnessapp.models;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * MealData class to track meals and water intake
- * Demonstrates: Classes, ArrayList, constructors, accessors, mutators
+ * Demonstrates: Classes, ArrayList, constructors, accessors, mutators, abstract class inheritance
  */
-public class MealData implements Serializable {
-    private ArrayList<String> meals;
+public class MealData extends ListTrackingData {
     private int waterIntake; // in ml
     private int caloriesEaten;
     private int targetWater; // in ml
     private int targetCalories;
     
     public MealData() {
-        this.meals = new ArrayList<String>();
+        super(); // Initialize entries and totalCalories from ListTrackingData
         this.waterIntake = 0;
         this.caloriesEaten = 0;
         this.targetWater = 2000; // 2 liters default
@@ -24,7 +22,7 @@ public class MealData implements Serializable {
     
     // Accessors
     public ArrayList<String> getMeals() {
-        return meals;
+        return entries; // Use entries from parent class
     }
     
     public int getWaterIntake() {
@@ -45,8 +43,30 @@ public class MealData implements Serializable {
     
     // Mutators
     public void addMeal(String meal, int calories) {
-        this.meals.add(meal);
+        addEntry(meal, calories);
+    }
+    
+    @Override
+    public void addEntry(String entry, int calories) {
+        String mealEntry = entry + " - " + calories + " kcal";
+        this.entries.add(mealEntry);
+        this.totalCalories += calories;
         this.caloriesEaten += calories;
+    }
+    
+    public void removeMeal(int index) {
+        removeEntry(index);
+    }
+    
+    @Override
+    public void removeEntry(int index) {
+        if (index >= 0 && index < entries.size()) {
+            String mealEntry = entries.get(index);
+            int calories = parseCaloriesFromEntry(mealEntry);
+            this.totalCalories = Math.max(0, this.totalCalories - calories);
+            this.caloriesEaten = Math.max(0, this.caloriesEaten - calories);
+            entries.remove(index);
+        }
     }
     
     public void setWaterIntake(int waterIntake) {
@@ -61,10 +81,21 @@ public class MealData implements Serializable {
         this.targetCalories = targetCalories;
     }
     
+    @Override
     public void reset() {
-        this.meals.clear();
+        super.reset(); // Clear entries and totalCalories
         this.waterIntake = 0;
         this.caloriesEaten = 0;
+    }
+    
+    @Override
+    public int getCurrentValue() {
+        return caloriesEaten;
+    }
+    
+    @Override
+    public int getTargetValue() {
+        return targetCalories;
     }
 }
 
