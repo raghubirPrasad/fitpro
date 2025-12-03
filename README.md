@@ -14,10 +14,9 @@ A comprehensive wellness tracking application built with Java Swing, demonstrati
    - Record workouts (Push-ups, Squats, Burpees, etc.) with MET-based calorie calculations
    - Track sports activities (Running, Cycling, Swimming, etc.) with time/distance inputs
    - Manual calorie entry option
-   - View "Fitness Today" list with all activities
+   - View "Fitness Today" list with all activities (includes reps/time information)
    - Remove selected activities from the list
    - Set and monitor target steps and calories
-   - "New Day" button to reset daily data
 
 3. **Meal Tracking**
    - Add meals from predefined categories (Breakfast, Lunch, Dinner, Snacks)
@@ -26,21 +25,18 @@ A comprehensive wellness tracking application built with Java Swing, demonstrati
    - Set targets for water and calorie intake
    - View "Meals Today" list with all meals consumed
    - Remove selected meals from the list
-   - "New Day" button to reset daily data
 
 4. **Habit Tracking**
    - Create new habits
    - Toggle habits as completed/uncompleted
    - Remove habits
    - View completion status and progress
-   - "New Day" button to reset habit completion
 
 5. **Mindfulness & Meditation**
    - Track daily meditation time
    - Set target meditation time
    - Track mood (Happy, Neutral, Sad, Anxious, Angry)
    - View current mood status
-   - "New Day" button to reset meditation data
 
 6. **Health Calculators**
    - BMI (Body Mass Index) calculator with category classification
@@ -56,6 +52,7 @@ A comprehensive wellness tracking application built with Java Swing, demonstrati
      - Calories eaten vs target
      - Habit progress (completed habits)
      - Mindfulness meter (meditation time)
+   - "New Day" button to reset all tracking data at once
 
 8. **Profile Management**
    - View user profile information
@@ -82,7 +79,7 @@ A comprehensive wellness tracking application built with Java Swing, demonstrati
 - **Final Fields**: User class has final height and weight (immutability)
 - **Collections Framework**: ArrayList, HashMap, Iterator usage
 - **Exception Handling**: 
-  - Custom exceptions: InvalidInputException, NegativeValueException, DecimalValueException, NumericValueException, SpecialCharacterException
+  - Custom exceptions: InvalidInputException, NegativeValueException, DecimalValueException, NumericValueException, SpecialCharacterException, ZeroValueException
   - try-catch blocks with multiple exception types
   - throw/throws keywords for exception propagation
 - **Interfaces**: Comparable, Serializable, ActionListener, DocumentListener
@@ -144,7 +141,8 @@ fitpro/
 │       │   ├── NegativeValueException.java
 │       │   ├── DecimalValueException.java
 │       │   ├── NumericValueException.java
-│       │   └── SpecialCharacterException.java
+│       │   ├── SpecialCharacterException.java
+│       │   └── ZeroValueException.java
 │       ├── models/
 │       │   ├── User.java
 │       │   ├── FitnessData.java
@@ -210,13 +208,23 @@ The application currently uses **in-memory storage** for session data:
 The app includes comprehensive validation through the `Validator` utility class with multiple specific exception types:
 
 ### Numeric Field Validation:
-- **Steps and Age**: 
+- **Steps**: 
   - No decimal values allowed (throws `DecimalValueException`)
   - No negative values allowed (throws `NegativeValueException`)
+  - Zero is allowed (can add 0 steps)
   - Must be whole numbers only
+- **Age**: 
+  - No decimal values allowed (throws `DecimalValueException`)
+  - No negative values allowed (throws `NegativeValueException`)
+  - No zero values allowed (throws `ZeroValueException`)
+  - Must be whole numbers only
+- **Height and Weight**: 
+  - No negative values allowed (throws `NegativeValueException`)
+  - No zero values allowed (throws `ZeroValueException`)
+  - Decimals allowed
 - **All Other Numeric Fields** (calories, water, meditation time, targets, etc.):
   - No negative values allowed (throws `NegativeValueException`)
-  - Decimals allowed where appropriate (weight, height, time, distance, speed)
+  - Decimals allowed where appropriate (time, distance, speed)
 
 ### Text Field Validation:
 - **Name Field**: 
@@ -226,6 +234,9 @@ The app includes comprehensive validation through the `Validator` utility class 
 - **Username Field**: 
   - Only alphabets, numbers, and underscore allowed
   - Throws `SpecialCharacterException` if special characters (other than underscore) are entered
+- **Activity/Item/Habit Name Fields**: 
+  - Only alphabets and numbers allowed (no special characters, no underscore)
+  - Throws `SpecialCharacterException` if special characters are entered
 
 ### General Validation:
 - **Empty field validation**: Prevents empty required fields (throws `InvalidInputException`)
@@ -297,8 +308,9 @@ The app includes comprehensive validation through the `Validator` utility class 
     - View calculated health metrics
 
 11. **New Day**: 
-    - Click "New Day" button on Fitness, Meals, Habits, or Mindfulness pages
-    - Confirms before resetting daily data
+    - Click "New Day" button on Dashboard
+    - Confirms before resetting all daily tracking data (fitness, meals, habits, mindfulness)
+    - Resets all activities, meal entries, habit completion status, and meditation data
 
 ## Technical Highlights
 
@@ -308,15 +320,18 @@ The app includes comprehensive validation through the `Validator` utility class 
 - **Design Patterns**: Singleton, Composite, Strategy, Decorator, Command patterns
 - **Animations**: Smooth fade-in effects, animated progress bars, number counting animations
 - **Error Handling**: 
-  - Comprehensive validation with 5 custom exception types
-  - Specific exceptions for different error types (negative values, decimals, special characters, numeric values in text)
+  - Comprehensive validation with 6 custom exception types
+  - Specific exceptions for different error types (negative values, decimals, zero values, special characters, numeric values in text)
   - User-friendly, context-specific error messages displayed via JOptionPane
   - Multiple exception types caught in single catch blocks (exception chaining)
   - Validation rules enforced through Validator utility class:
-    - Steps and Age: No decimals, no negatives
-    - All numeric fields: No negatives
+    - Steps: No decimals, no negatives (zero allowed)
+    - Age: No decimals, no negatives, no zero
+    - Height and Weight: No negatives, no zero, decimals allowed
+    - All other numeric fields: No negatives, decimals allowed where appropriate
     - Name field: Alphabets only (no numbers, no special characters)
     - Username field: Alphabets, numbers, and underscore only (no special characters)
+    - Activity/Item/Habit names: Alphabets and numbers only (no special characters)
 - **Clean Architecture**: Separation of concerns (models, GUI, utils, exceptions)
 
 ## Documentation
@@ -324,10 +339,15 @@ The app includes comprehensive validation through the `Validator` utility class 
 - **CONCEPTS_USED.md**: Overview of OOP concepts demonstrated
 - **CONCEPTS_USED_NEW.md**: Comprehensive documentation of all course concepts with specific code locations
 
+## Repository
+
+- **Remote Origin**: [raghubirPrasad/fitpro](https://github.com/raghubirPrasad/fitpro)
+- Public repository for the FitPro wellness tracking application
+
 ## Notes
 
 - The application demonstrates advanced Java OOP concepts including abstract classes and inheritance hierarchies
 - All data models implement Serializable for future file persistence
 - The application uses Swing components with custom styling and animations
 - Code follows consistent naming conventions and design patterns
-
+- Gender selection limited to Male and Female options

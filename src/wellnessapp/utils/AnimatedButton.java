@@ -90,11 +90,7 @@ public class AnimatedButton extends JButton {
                     }
                 }
                 
-                // Interpolate between normal and hover colors
-                int r = (int) (normalColor.getRed() + (hoverColor.getRed() - normalColor.getRed()) * hoverAlpha);
-                int g = (int) (normalColor.getGreen() + (hoverColor.getGreen() - normalColor.getGreen()) * hoverAlpha);
-                int b = (int) (normalColor.getBlue() + (hoverColor.getBlue() - normalColor.getBlue()) * hoverAlpha);
-                
+                // Trigger repaint to update button color (color interpolation done in paintComponent)
                 repaint();
             }
         });
@@ -148,4 +144,3 @@ public class AnimatedButton extends JButton {
         repaint();
     }
 }
-
